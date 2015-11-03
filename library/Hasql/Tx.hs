@@ -4,8 +4,8 @@ where
 import Hasql.Tx.Prelude
 import qualified Hasql.Connection as Connection
 import qualified Hasql.Query as Query
-import qualified Hasql.ErrorCodes as ErrorCodes
 import qualified Hasql.Tx.Queries as Queries
+import qualified PostgreSQL.ErrorCodes as ErrorCodes
 
 
 newtype Tx a =

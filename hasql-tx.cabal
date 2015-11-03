@@ -50,6 +50,7 @@ library
     -- parsing:
     attoparsec >= 0.10 && < 0.14,
     -- database:
+    postgresql-error-codes >= 1 && < 2,
     postgresql-binary == 0.5.*,
     postgresql-libpq == 0.9.*,
     -- data:
