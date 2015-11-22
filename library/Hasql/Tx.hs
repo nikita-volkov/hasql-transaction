@@ -51,8 +51,8 @@ data IsolationLevel =
 -- |
 -- Execute the transaction on a connection with the provided settings.
 {-# INLINABLE run #-}
-run :: Tx a -> Hasql.Connection -> IsolationLevel -> Mode -> IO (Either Hasql.ResultsError a)
-run (Tx tx) connection isolation mode =
+run :: Tx a -> IsolationLevel -> Mode -> Hasql.Connection -> IO (Either Hasql.ResultsError a)
+run (Tx tx) isolation mode connection =
   runEitherT $ do
     EitherT $ Hasql.query connection (Queries.beginTransaction mode') ()
     counterRef <- lift $ newIORef 0
@@ -60,7 +60,7 @@ run (Tx tx) connection isolation mode =
     case resultEither of
       Left (Hasql.ResultError (Hasql.ServerError code _ _ _))
         | code == ErrorCodes.serialization_failure ->
-          EitherT $ run (Tx tx) connection isolation mode
+          EitherT $ run (Tx tx) isolation mode connection
       _ -> do
         result <- EitherT $ pure resultEither
         let
@@ -83,7 +83,7 @@ run (Tx tx) connection isolation mode =
 -- |
 -- Execute a query in the context of a transaction.
 {-# INLINABLE query #-}
-query :: Hasql.Query a b -> a -> Tx b
-query query params =
+query :: a -> Hasql.Query a b -> Tx b
+query params query =
   Tx $ ReaderT $ \(connection, _) -> EitherT $
   Hasql.query connection query params

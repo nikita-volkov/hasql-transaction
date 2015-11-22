@@ -1,7 +1,7 @@
 name:
   hasql-tx
 version:
-  0.1
+  0.2
 category:
   Hasql, Database, PostgreSQL
 synopsis:
