@@ -2,7 +2,7 @@ module Hasql.Tx.Queries
 where
 
 import Hasql.Tx.Prelude
-import qualified Hasql as H
+import qualified Hasql.Query as HQ
 import qualified Hasql.Encoding as HE
 import qualified Hasql.Decoding as HD
 import qualified ByteString.TreeBuilder as TB
@@ -19,9 +19,9 @@ data Isolation =
 type TransactionMode =
   (Isolation, Bool)
 
-beginTransaction :: TransactionMode -> H.Query () ()
+beginTransaction :: TransactionMode -> HQ.Query () ()
 beginTransaction (isolation, write) =
-  H.Query sql HE.unit HD.unit True
+  HQ.Query sql HE.unit HD.unit True
   where
     sql =
       TB.toByteString $
@@ -41,33 +41,33 @@ beginTransaction (isolation, write) =
           False -> "READ ONLY"
       ]
 
-commitTransaction :: H.Query () ()
+commitTransaction :: HQ.Query () ()
 commitTransaction =
-  H.Query "commit" HE.unit HD.unit True
+  HQ.Query "commit" HE.unit HD.unit True
 
-abortTransaction :: H.Query () ()
+abortTransaction :: HQ.Query () ()
 abortTransaction =
-  H.Query "abort" HE.unit HD.unit True
+  HQ.Query "abort" HE.unit HD.unit True
 
 
 -- * Streaming
 -------------------------
 
-declareCursor :: ByteString -> ByteString -> HE.Params a -> H.Query a ()
+declareCursor :: ByteString -> ByteString -> HE.Params a -> HQ.Query a ()
 declareCursor name sql encoder =
-  H.Query sql' encoder HD.unit False
+  HQ.Query sql' encoder HD.unit False
   where
     sql' =
       TB.toByteString $
       "DECLARE " <> TB.byteString name <> " NO SCROLL CURSOR FOR " <> TB.byteString sql
 
-closeCursor :: H.Query ByteString ()
+closeCursor :: HQ.Query ByteString ()
 closeCursor =
-  H.Query "CLOSE $1" (HE.value HE.bytea) HD.unit True
+  HQ.Query "CLOSE $1" (HE.value HE.bytea) HD.unit True
 
-fetchFromCursor :: (b -> a -> b) -> b -> HD.Row a -> H.Query (Int64, ByteString) b
+fetchFromCursor :: (b -> a -> b) -> b -> HD.Row a -> HQ.Query (Int64, ByteString) b
 fetchFromCursor step init rowDec =
-  H.Query sql encoder decoder True
+  HQ.Query sql encoder decoder True
   where
     sql =
       "FETCH FORWARD $1 FROM $2"

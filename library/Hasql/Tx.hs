@@ -11,13 +11,14 @@ module Hasql.Tx
 where
 
 import Hasql.Tx.Prelude
-import qualified Hasql
+import qualified Hasql.Connection as Connection
+import qualified Hasql.Query as Query
 import qualified Hasql.Tx.Queries as Queries
 import qualified PostgreSQL.ErrorCodes as ErrorCodes
 
 
 newtype Tx a =
-  Tx (ReaderT (Hasql.Connection, IORef Int) (EitherT Hasql.ResultsError IO) a)
+  Tx (ReaderT (Connection.Connection, IORef Int) (EitherT Query.ResultsError IO) a)
   deriving (Functor, Applicative, Monad)
 
 -- |
@@ -51,14 +52,14 @@ data IsolationLevel =
 -- |
 -- Execute the transaction on a connection with the provided settings.
 {-# INLINABLE run #-}
-run :: Tx a -> IsolationLevel -> Mode -> Hasql.Connection -> IO (Either Hasql.ResultsError a)
+run :: Tx a -> IsolationLevel -> Mode -> Connection.Connection -> IO (Either Query.ResultsError a)
 run (Tx tx) isolation mode connection =
   runEitherT $ do
-    EitherT $ Hasql.query connection (Queries.beginTransaction mode') ()
+    EitherT $ Query.run (Queries.beginTransaction mode') () connection
     counterRef <- lift $ newIORef 0
     resultEither <- lift $ runEitherT $ runReaderT tx (connection, counterRef)
     case resultEither of
-      Left (Hasql.ResultError (Hasql.ServerError code _ _ _))
+      Left (Query.ResultError (Query.ServerError code _ _ _))
         | code == ErrorCodes.serialization_failure ->
           EitherT $ run (Tx tx) isolation mode connection
       _ -> do
@@ -69,7 +70,7 @@ run (Tx tx) isolation mode connection =
               then Queries.commitTransaction
               else Queries.abortTransaction
           in
-            EitherT $ Hasql.query connection query ()
+            EitherT $ Query.run query () connection
         pure result
   where
     mode' =
@@ -83,7 +84,7 @@ run (Tx tx) isolation mode connection =
 -- |
 -- Execute a query in the context of a transaction.
 {-# INLINABLE query #-}
-query :: a -> Hasql.Query a b -> Tx b
+query :: a -> Query.Query a b -> Tx b
 query params query =
   Tx $ ReaderT $ \(connection, _) -> EitherT $
-  Hasql.query connection query params
+  Query.run query params connection
