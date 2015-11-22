@@ -3,7 +3,7 @@ name:
 version:
   1
 category:
-  Database, DSL, PostgreSQL
+  Hasql, Database, PostgreSQL
 synopsis:
 homepage:
   https://github.com/nikita-volkov/hasql-tx 
