@@ -1,7 +1,7 @@
 name:
   hasql-tx
 version:
-  0.2.1
+  0.2.2
 category:
   Hasql, Database, PostgreSQL
 synopsis:
@@ -46,7 +46,7 @@ library
   exposed-modules:
     Hasql.Tx
   build-depends:
-    hasql >= 0.13 && < 0.14,
+    hasql >= 0.13 && < 0.15,
     -- parsing:
     attoparsec >= 0.10 && < 0.14,
     -- database:
