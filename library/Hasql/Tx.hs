@@ -1,4 +1,13 @@
 module Hasql.Tx
+(
+  -- * Transaction settings
+  Mode(..),
+  IsolationLevel(..),
+  -- * Transaction monad
+  Tx,
+  run,
+  query,
+)
 where
 
 import Hasql.Tx.Prelude
@@ -39,6 +48,8 @@ data IsolationLevel =
   Serializable
   deriving (Show, Eq, Ord, Enum, Bounded)
 
+-- |
+-- Execute the transaction on a connection with the provided settings.
 run :: Tx a -> Hasql.Connection -> IsolationLevel -> Mode -> IO (Either Hasql.ResultsError a)
 run (Tx tx) connection isolation mode =
   runEitherT $ do
@@ -68,6 +79,8 @@ run (Tx tx) connection isolation mode =
         Write -> (True, True)
         WriteWithoutCommitting -> (True, False)
 
+-- |
+-- Execute a query in the context of a transaction.
 query :: Hasql.Query a b -> a -> Tx b
 query query params =
   Tx $ ReaderT $ \(connection, _) -> EitherT $
