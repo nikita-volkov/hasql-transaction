@@ -50,6 +50,7 @@ data IsolationLevel =
 
 -- |
 -- Execute the transaction on a connection with the provided settings.
+{-# INLINABLE run #-}
 run :: Tx a -> Hasql.Connection -> IsolationLevel -> Mode -> IO (Either Hasql.ResultsError a)
 run (Tx tx) connection isolation mode =
   runEitherT $ do
@@ -81,6 +82,7 @@ run (Tx tx) connection isolation mode =
 
 -- |
 -- Execute a query in the context of a transaction.
+{-# INLINABLE query #-}
 query :: Hasql.Query a b -> a -> Tx b
 query query params =
   Tx $ ReaderT $ \(connection, _) -> EitherT $
