@@ -2,14 +2,13 @@ module Hasql.Tx
 where
 
 import Hasql.Tx.Prelude
-import qualified Hasql.Connection as Connection
-import qualified Hasql.Query as Query
+import qualified Hasql
 import qualified Hasql.Tx.Queries as Queries
 import qualified PostgreSQL.ErrorCodes as ErrorCodes
 
 
 newtype Tx a =
-  Tx (ReaderT (Connection.Connection, IORef Int) (EitherT Connection.ResultsError IO) a)
+  Tx (ReaderT (Hasql.Connection, IORef Int) (EitherT Hasql.ResultsError IO) a)
   deriving (Functor, Applicative, Monad)
 
 -- |
@@ -40,14 +39,14 @@ data IsolationLevel =
   Serializable
   deriving (Show, Eq, Ord, Enum, Bounded)
 
-run :: Tx a -> Connection.Connection -> IsolationLevel -> Mode -> IO (Either Connection.ResultsError a)
+run :: Tx a -> Hasql.Connection -> IsolationLevel -> Mode -> IO (Either Hasql.ResultsError a)
 run (Tx tx) connection isolation mode =
   runEitherT $ do
-    EitherT $ Connection.executeParametricQuery connection (Queries.beginTransaction mode') ()
+    EitherT $ Hasql.query connection (Queries.beginTransaction mode') ()
     counterRef <- lift $ newIORef 0
     resultEither <- lift $ runEitherT $ runReaderT tx (connection, counterRef)
     case resultEither of
-      Left (Connection.ResultError (Connection.ServerError code _ _ _))
+      Left (Hasql.ResultError (Hasql.ServerError code _ _ _))
         | code == ErrorCodes.serialization_failure ->
           EitherT $ run (Tx tx) connection isolation mode
       _ -> do
@@ -58,7 +57,7 @@ run (Tx tx) connection isolation mode =
               then Queries.commitTransaction
               else Queries.abortTransaction
           in
-            EitherT $ Connection.executeParametricQuery connection query ()
+            EitherT $ Hasql.query connection query ()
         pure result
   where
     mode' =
@@ -69,7 +68,7 @@ run (Tx tx) connection isolation mode =
         Write -> (True, True)
         WriteWithoutCommitting -> (True, False)
 
-parametricQuery :: Query.ParametricQuery a b -> a -> Tx b
-parametricQuery query params =
+query :: Hasql.Query a b -> a -> Tx b
+query query params =
   Tx $ ReaderT $ \(connection, _) -> EitherT $
-  Connection.executeParametricQuery connection query params
+  Hasql.query connection query params

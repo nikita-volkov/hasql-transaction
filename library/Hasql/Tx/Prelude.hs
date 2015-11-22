@@ -1,8 +1,6 @@
 module Hasql.Tx.Prelude
 ( 
   module Exports,
-  bug,
-  bottom,
 )
 where
 
@@ -24,6 +22,10 @@ import Control.Monad.Trans.State.Strict as Exports hiding (liftCallCC, liftCatch
 import Data.Functor.Contravariant as Exports
 import Data.Functor.Contravariant.Divisible as Exports
 
+-- contravariant-extras
+-------------------------
+import Contravariant.Extras as Exports
+
 -- either
 -------------------------
 import Control.Monad.Trans.Either as Exports
@@ -36,24 +38,3 @@ import Data.Text as Exports (Text)
 -- bytestring
 -------------------------
 import Data.ByteString as Exports (ByteString)
-
--- placeholders
--------------------------
-import Development.Placeholders as Exports
-
--- loch-th
--------------------------
-import Debug.Trace.LocationTH as Exports
-
--- custom
--------------------------
-import qualified Debug.Trace.LocationTH
-
-
-bug =
-  [e| $(Debug.Trace.LocationTH.failure) . (msg <>) |]
-  where
-    msg = "A \"hasql\" package bug: " :: String
-
-bottom =
-  [e| $bug "Bottom evaluated" |]

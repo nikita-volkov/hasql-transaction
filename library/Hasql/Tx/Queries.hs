@@ -2,9 +2,10 @@ module Hasql.Tx.Queries
 where
 
 import Hasql.Tx.Prelude
-import Hasql.Query
-import qualified Hasql.Serialization as S
-import qualified Hasql.Deserialization as D
+import qualified Hasql as H
+import qualified Hasql.Encoding as HE
+import qualified Hasql.Decoding as HD
+import qualified ByteString.TreeBuilder as TB
 
 
 -- * Transactions
@@ -18,12 +19,13 @@ data Isolation =
 type TransactionMode =
   (Isolation, Bool)
 
-beginTransaction :: TransactionMode -> ParametricQuery () ()
+beginTransaction :: TransactionMode -> H.Query () ()
 beginTransaction (isolation, write) =
-  (template, mempty, D.result D.noResult, True)
+  H.Query sql HE.unit HD.unit True
   where
-    template =
-      mconcat
+    sql =
+      TB.toByteString $
+      mconcat $
       [
         "BEGIN "
         ,
@@ -39,37 +41,39 @@ beginTransaction (isolation, write) =
           False -> "READ ONLY"
       ]
 
-commitTransaction :: ParametricQuery () ()
+commitTransaction :: H.Query () ()
 commitTransaction =
-  ("COMMIT", mempty, D.result D.noResult, True)
+  H.Query "commit" HE.unit HD.unit True
 
-abortTransaction :: ParametricQuery () ()
+abortTransaction :: H.Query () ()
 abortTransaction =
-  ("ABORT", mempty, D.result D.noResult, True)
+  H.Query "abort" HE.unit HD.unit True
 
 
 -- * Streaming
 -------------------------
 
-declareCursor :: ByteString -> ParametricQuery a b -> ParametricQuery a b
-declareCursor name (template, serializer, deserializer, preparable) =
-  (template', serializer, deserializer, False)
+declareCursor :: ByteString -> ByteString -> HE.Params a -> H.Query a ()
+declareCursor name sql encoder =
+  H.Query sql' encoder HD.unit False
   where
-    template' =
-      "DECLARE " <> name <> " NO SCROLL CURSOR FOR " <> template
+    sql' =
+      TB.toByteString $
+      "DECLARE " <> TB.byteString name <> " NO SCROLL CURSOR FOR " <> TB.byteString sql
 
-closeCursor :: ParametricQuery ByteString ()
+closeCursor :: H.Query ByteString ()
 closeCursor =
-  ("CLOSE $1", S.value (S.nonNull S.bytea), D.result D.noResult, True)
+  H.Query "CLOSE $1" (HE.value HE.bytea) HD.unit True
 
-fetchFromCursor :: D.Results a -> ParametricQuery (Int64, ByteString) a
-fetchFromCursor deserializer =
-  (template, serializer, deserializer, True)
+fetchFromCursor :: (b -> a -> b) -> b -> HD.Row a -> H.Query (Int64, ByteString) b
+fetchFromCursor step init rowDec =
+  H.Query sql encoder decoder True
   where
-    template =
+    sql =
       "FETCH FORWARD $1 FROM $2"
-    serializer =
-      contramap fst (S.value (S.nonNull S.int8)) <>
-      contramap snd (S.value (S.nonNull S.bytea))
-
-
+    encoder =
+      contrazip2
+        (HE.value HE.int8)
+        (HE.value HE.bytea)
+    decoder =
+      HD.foldlRows step init rowDec
