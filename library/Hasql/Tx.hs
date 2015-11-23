@@ -35,7 +35,7 @@ data Mode =
   -- Useful for testing, 
   -- allowing you to modify your database, 
   -- producing some result based on your changes,
-  -- and to let Hasql roll all the changes back on the exit from the transaction.
+  -- and letting Hasql roll all the changes back on the exit from the transaction.
   WriteWithoutCommitting
   deriving (Show, Eq, Ord, Enum, Bounded)
 
