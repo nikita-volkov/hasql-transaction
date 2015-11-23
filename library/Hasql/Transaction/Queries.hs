@@ -1,7 +1,7 @@
-module Hasql.Tx.Queries
+module Hasql.Transaction.Queries
 where
 
-import Hasql.Tx.Prelude
+import Hasql.Transaction.Prelude
 import qualified Hasql.Query as HQ
 import qualified Hasql.Encoding as HE
 import qualified Hasql.Decoding as HD

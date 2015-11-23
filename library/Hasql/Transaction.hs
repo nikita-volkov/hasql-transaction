@@ -1,24 +1,24 @@
-module Hasql.Tx
+module Hasql.Transaction
 (
   -- * Transaction settings
   Mode(..),
   IsolationLevel(..),
   -- * Transaction monad
-  Tx,
+  Transaction,
   run,
   query,
 )
 where
 
-import Hasql.Tx.Prelude
+import Hasql.Transaction.Prelude
 import qualified Hasql.Connection as Connection
 import qualified Hasql.Query as Query
-import qualified Hasql.Tx.Queries as Queries
+import qualified Hasql.Transaction.Queries as Queries
 import qualified PostgreSQL.ErrorCodes as ErrorCodes
 
 
-newtype Tx a =
-  Tx (ReaderT (Connection.Connection, IORef Int) (EitherT Query.ResultsError IO) a)
+newtype Transaction a =
+  Transaction (ReaderT (Connection.Connection, IORef Int) (EitherT Query.ResultsError IO) a)
   deriving (Functor, Applicative, Monad)
 
 -- |
@@ -52,8 +52,8 @@ data IsolationLevel =
 -- |
 -- Execute the transaction using the provided isolation level, mode and a database connection.
 {-# INLINABLE run #-}
-run :: Tx a -> IsolationLevel -> Mode -> Connection.Connection -> IO (Either Query.ResultsError a)
-run (Tx tx) isolation mode connection =
+run :: Transaction a -> IsolationLevel -> Mode -> Connection.Connection -> IO (Either Query.ResultsError a)
+run (Transaction tx) isolation mode connection =
   runEitherT $ do
     EitherT $ Query.run (Queries.beginTransaction mode') () connection
     counterRef <- lift $ newIORef 0
@@ -61,7 +61,7 @@ run (Tx tx) isolation mode connection =
     case resultEither of
       Left (Query.ResultError (Query.ServerError code _ _ _))
         | code == ErrorCodes.serialization_failure ->
-          EitherT $ run (Tx tx) isolation mode connection
+          EitherT $ run (Transaction tx) isolation mode connection
       _ -> do
         result <- EitherT $ pure resultEither
         let
@@ -84,7 +84,7 @@ run (Tx tx) isolation mode connection =
 -- |
 -- Execute a query in the context of a transaction.
 {-# INLINABLE query #-}
-query :: a -> Query.Query a b -> Tx b
+query :: a -> Query.Query a b -> Transaction b
 query params query =
-  Tx $ ReaderT $ \(connection, _) -> EitherT $
+  Transaction $ ReaderT $ \(connection, _) -> EitherT $
   Query.run query params connection

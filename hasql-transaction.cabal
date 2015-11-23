@@ -1,14 +1,14 @@
 name:
-  hasql-tx
+  hasql-transaction
 version:
-  0.2.2.1
+  0.3
 category:
   Hasql, Database, PostgreSQL
 synopsis:
 homepage:
-  https://github.com/nikita-volkov/hasql-tx 
+  https://github.com/nikita-volkov/hasql-transaction 
 bug-reports:
-  https://github.com/nikita-volkov/hasql-tx/issues 
+  https://github.com/nikita-volkov/hasql-transaction/issues 
 author:
   Nikita Volkov <nikita.y.volkov@mail.ru>
 maintainer:
@@ -29,7 +29,7 @@ source-repository head
   type:
     git
   location:
-    git://github.com/nikita-volkov/hasql-tx.git
+    git://github.com/nikita-volkov/hasql-transaction.git
 
 
 library
@@ -41,10 +41,10 @@ library
   default-language:
     Haskell2010
   other-modules:
-    Hasql.Tx.Prelude
-    Hasql.Tx.Queries
+    Hasql.Transaction.Prelude
+    Hasql.Transaction.Queries
   exposed-modules:
-    Hasql.Tx
+    Hasql.Transaction
   build-depends:
     hasql >= 0.13 && < 0.15,
     -- parsing:
@@ -82,7 +82,7 @@ executable demo
     Haskell2010
   build-depends:
     contravariant,
-    hasql-tx,
+    hasql-transaction,
     text,
     bytestring,
     base-prelude

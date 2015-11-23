@@ -1,4 +1,4 @@
-module Hasql.Tx.Prelude
+module Hasql.Transaction.Prelude
 ( 
   module Exports,
 )
