@@ -31,10 +31,6 @@ import Contravariant.Extras as Exports
 import Control.Monad.Trans.Either as Exports
 import Data.Either.Combinators as Exports
 
--- text
--------------------------
-import Data.Text as Exports (Text)
-
 -- bytestring
 -------------------------
 import Data.ByteString as Exports (ByteString)
