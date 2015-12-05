@@ -1,10 +1,11 @@
 name:
   hasql-transaction
 version:
-  0.3.0.1
+  0.3.0.2
 category:
   Hasql, Database, PostgreSQL
 synopsis:
+  A composable abstraction over the retryable transactions for Hasql
 homepage:
   https://github.com/nikita-volkov/hasql-transaction 
 bug-reports:
