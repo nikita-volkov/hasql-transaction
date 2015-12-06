@@ -17,6 +17,12 @@ import qualified Hasql.Transaction.Queries as Queries
 import qualified PostgreSQL.ErrorCodes as ErrorCodes
 
 
+-- |
+-- A composable abstraction over the retryable transactions.
+-- 
+-- Executes multiple queries under the specified mode and isolation level,
+-- while automatically retrying the transaction in case of conflicts.
+-- Thus this abstraction closely reproduces the behaviour of 'STM'.
 newtype Transaction a =
   Transaction (ReaderT (Connection.Connection, IORef Int) (EitherT Query.ResultsError IO) a)
   deriving (Functor, Applicative, Monad)
