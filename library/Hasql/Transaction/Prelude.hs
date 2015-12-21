@@ -1,6 +1,7 @@
 module Hasql.Transaction.Prelude
 ( 
   module Exports,
+  tryError,
 )
 where
 
@@ -16,6 +17,10 @@ import Control.Monad.Trans.Class as Exports
 import Control.Monad.Trans.Maybe as Exports hiding (liftListen, liftPass)
 import Control.Monad.Trans.Reader as Exports hiding (liftCallCC, liftCatch)
 import Control.Monad.Trans.State.Strict as Exports hiding (liftCallCC, liftCatch, liftListen, liftPass)
+
+-- mtl
+-------------------------
+import Control.Monad.Error.Class as Exports (MonadError (..))
 
 -- contravariant
 -------------------------
@@ -34,3 +39,7 @@ import Data.Either.Combinators as Exports
 -- bytestring
 -------------------------
 import Data.ByteString as Exports (ByteString)
+
+tryError :: MonadError e m => m a -> m (Either e a)
+tryError m =
+  catchError (liftM Right m) (return . Left)

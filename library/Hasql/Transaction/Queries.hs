@@ -21,7 +21,7 @@ type TransactionMode =
 
 beginTransaction :: TransactionMode -> HQ.Query () ()
 beginTransaction (isolation, write) =
-  HQ.Query sql HE.unit HD.unit True
+  HQ.statement sql HE.unit HD.unit True
   where
     sql =
       TB.toByteString $
@@ -43,11 +43,11 @@ beginTransaction (isolation, write) =
 
 commitTransaction :: HQ.Query () ()
 commitTransaction =
-  HQ.Query "commit" HE.unit HD.unit True
+  HQ.statement "commit" HE.unit HD.unit True
 
 abortTransaction :: HQ.Query () ()
 abortTransaction =
-  HQ.Query "abort" HE.unit HD.unit True
+  HQ.statement "abort" HE.unit HD.unit True
 
 
 -- * Streaming
@@ -55,7 +55,7 @@ abortTransaction =
 
 declareCursor :: ByteString -> ByteString -> HE.Params a -> HQ.Query a ()
 declareCursor name sql encoder =
-  HQ.Query sql' encoder HD.unit False
+  HQ.statement sql' encoder HD.unit False
   where
     sql' =
       TB.toByteString $
@@ -63,11 +63,11 @@ declareCursor name sql encoder =
 
 closeCursor :: HQ.Query ByteString ()
 closeCursor =
-  HQ.Query "CLOSE $1" (HE.value HE.bytea) HD.unit True
+  HQ.statement "CLOSE $1" (HE.value HE.bytea) HD.unit True
 
 fetchFromCursor :: (b -> a -> b) -> b -> HD.Row a -> HQ.Query (Int64, ByteString) b
 fetchFromCursor step init rowDec =
-  HQ.Query sql encoder decoder True
+  HQ.statement sql encoder decoder True
   where
     sql =
       "FETCH FORWARD $1 FROM $2"

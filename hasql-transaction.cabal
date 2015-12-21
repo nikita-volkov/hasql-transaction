@@ -1,7 +1,7 @@
 name:
   hasql-transaction
 version:
-  0.3.1
+  0.4
 category:
   Hasql, Database, PostgreSQL
 synopsis:
@@ -47,7 +47,7 @@ library
   exposed-modules:
     Hasql.Transaction
   build-depends:
-    hasql >= 0.15 && < 0.16,
+    hasql >= 0.17 && < 0.18,
     -- database:
     postgresql-error-codes >= 1 && < 2,
     -- data:
@@ -57,6 +57,7 @@ library
     contravariant >= 1.3 && < 2,
     contravariant-extras >= 0.3 && < 0.4,
     either >= 4.4.1 && < 5,
+    mtl >= 2 && < 3,
     transformers >= 0.3 && < 0.5,
     -- general:
     base-prelude >= 0.1.19 && < 0.2

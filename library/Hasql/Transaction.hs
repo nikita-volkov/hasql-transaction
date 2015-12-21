@@ -6,13 +6,14 @@ module Hasql.Transaction
   -- * Transaction monad
   Transaction,
   run,
+  sql,
   query,
 )
 where
 
 import Hasql.Transaction.Prelude
-import qualified Hasql.Connection as Connection
 import qualified Hasql.Query as Query
+import qualified Hasql.Session as Session
 import qualified Hasql.Transaction.Queries as Queries
 import qualified PostgreSQL.ErrorCodes as ErrorCodes
 
@@ -24,7 +25,7 @@ import qualified PostgreSQL.ErrorCodes as ErrorCodes
 -- while automatically retrying the transaction in case of conflicts.
 -- Thus this abstraction closely reproduces the behaviour of 'STM'.
 newtype Transaction a =
-  Transaction (ReaderT (Connection.Connection, IORef Int) (EitherT Query.ResultsError IO) a)
+  Transaction (Session.Session a)
   deriving (Functor, Applicative, Monad)
 
 -- |
@@ -58,25 +59,20 @@ data IsolationLevel =
 -- |
 -- Execute the transaction using the provided isolation level, mode and database connection.
 {-# INLINABLE run #-}
-run :: Transaction a -> IsolationLevel -> Mode -> Connection.Connection -> IO (Either Query.ResultsError a)
-run (Transaction tx) isolation mode connection =
-  runEitherT $ do
-    EitherT $ Query.run (Queries.beginTransaction mode') () connection
-    counterRef <- lift $ newIORef 0
-    resultEither <- lift $ runEitherT $ runReaderT tx (connection, counterRef)
+run :: Transaction a -> IsolationLevel -> Mode -> Session.Session a
+run (Transaction session) isolation mode =
+  do
+    Session.query () (Queries.beginTransaction mode')
+    resultEither <- tryError session
     case resultEither of
-      Left (Query.ResultError (Query.ServerError code _ _ _))
-        | code == ErrorCodes.serialization_failure ->
-          EitherT $ run (Transaction tx) isolation mode connection
-      _ -> do
-        result <- EitherT $ pure resultEither
-        let
-          query =
-            if commit
-              then Queries.commitTransaction
-              else Queries.abortTransaction
-          in
-            EitherT $ Query.run query () connection
+      Left error ->
+        case error of
+          Session.ResultError (Session.ServerError code _ _ _) | code == ErrorCodes.serialization_failure ->
+            run (Transaction session) isolation mode
+          _ -> 
+            throwError error
+      Right result -> do
+        Session.query () $ bool Queries.abortTransaction Queries.commitTransaction commit
         pure result
   where
     mode' =
@@ -88,9 +84,17 @@ run (Transaction tx) isolation mode connection =
         WriteWithoutCommitting -> (True, False)
 
 -- |
--- Execute a query in the context of a transaction.
-{-# INLINABLE query #-}
+-- Possibly a multi-statement query,
+-- which however cannot be parameterized or prepared,
+-- nor can any results of it be collected.
+{-# INLINE sql #-}
+sql :: ByteString -> Transaction ()
+sql sql =
+  Transaction $ Session.sql sql
+
+-- |
+-- Parameters and a specification of the parametric query to apply them to.
+{-# INLINE query #-}
 query :: a -> Query.Query a b -> Transaction b
 query params query =
-  Transaction $ ReaderT $ \(connection, _) -> EitherT $
-  Query.run query params connection
+  Transaction $ Session.query params query
