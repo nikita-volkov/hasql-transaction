@@ -57,7 +57,7 @@ data IsolationLevel =
   deriving (Show, Eq, Ord, Enum, Bounded)
 
 -- |
--- Execute the transaction using the provided isolation level, mode and database connection.
+-- Execute the transaction using the provided isolation level and mode.
 {-# INLINABLE run #-}
 run :: Transaction a -> IsolationLevel -> Mode -> Session.Session a
 run (Transaction session) isolation mode =
