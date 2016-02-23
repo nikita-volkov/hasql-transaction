@@ -65,7 +65,8 @@ run (Transaction session) isolation mode =
     Session.query () (Queries.beginTransaction mode')
     resultEither <- tryError session
     case resultEither of
-      Left error ->
+      Left error -> do
+        Session.query () Queries.abortTransaction
         case error of
           Session.ResultError (Session.ServerError code _ _ _) | code == ErrorCodes.serialization_failure ->
             run (Transaction session) isolation mode

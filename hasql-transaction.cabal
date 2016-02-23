@@ -1,7 +1,7 @@
 name:
   hasql-transaction
 version:
-  0.4.2
+  0.4.3
 category:
   Hasql, Database, PostgreSQL
 synopsis:
