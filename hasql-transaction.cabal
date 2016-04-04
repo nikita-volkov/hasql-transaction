@@ -1,7 +1,7 @@
 name:
   hasql-transaction
 version:
-  0.4.3
+  0.4.4
 category:
   Hasql, Database, PostgreSQL
 synopsis:
@@ -60,4 +60,4 @@ library
     mtl >= 2 && < 3,
     transformers >= 0.3 && < 0.5,
     -- general:
-    base-prelude >= 0.1.19 && < 0.2
+    base-prelude >= 0.1.19 && < 2
