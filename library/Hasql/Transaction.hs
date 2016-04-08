@@ -62,8 +62,9 @@ data IsolationLevel =
 run :: Transaction a -> IsolationLevel -> Mode -> Session.Session a
 run (Transaction session) isolation mode =
   do
-    Session.query () (Queries.beginTransaction mode')
-    resultEither <- tryError session
+    resultEither <- do
+      Session.query () (Queries.beginTransaction mode')
+      tryError session
     case resultEither of
       Left error -> do
         Session.query () Queries.abortTransaction
