@@ -31,11 +31,6 @@ import Data.Functor.Contravariant.Divisible as Exports
 -------------------------
 import Contravariant.Extras as Exports
 
--- either
--------------------------
-import Control.Monad.Trans.Either as Exports
-import Data.Either.Combinators as Exports
-
 -- bytestring
 -------------------------
 import Data.ByteString as Exports (ByteString)
