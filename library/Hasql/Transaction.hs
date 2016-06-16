@@ -15,7 +15,6 @@ import Hasql.Transaction.Prelude
 import qualified Hasql.Query as Query
 import qualified Hasql.Session as Session
 import qualified Hasql.Transaction.Queries as Queries
-import qualified PostgreSQL.ErrorCodes as ErrorCodes
 
 
 -- |
@@ -61,21 +60,23 @@ data IsolationLevel =
 {-# INLINABLE run #-}
 run :: Transaction a -> IsolationLevel -> Mode -> Session.Session a
 run (Transaction session) isolation mode =
-  do
-    resultEither <- do
-      Session.query () (Queries.beginTransaction mode')
-      tryError session
-    case resultEither of
-      Left error -> do
-        Session.query () Queries.abortTransaction
-        case error of
-          Session.ResultError (Session.ServerError code _ _ _) | code == ErrorCodes.serialization_failure ->
-            run (Transaction session) isolation mode
-          _ -> 
-            throwError error
-      Right result -> do
-        Session.query () $ bool Queries.abortTransaction Queries.commitTransaction commit
-        pure result
+  fix $
+  \ recur ->
+    do
+      resultEither <- do
+        Session.query () (Queries.beginTransaction mode')
+        tryError session
+      case resultEither of
+        Left error -> do
+          Session.query () Queries.abortTransaction
+          case error of
+            Session.ResultError (Session.ServerError "40001" _ _ _) ->
+              recur
+            _ -> 
+              throwError error
+        Right result -> do
+          Session.query () $ bool Queries.abortTransaction Queries.commitTransaction commit
+          pure result
   where
     mode' =
       (unsafeCoerce isolation, write)

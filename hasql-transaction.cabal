@@ -47,9 +47,8 @@ library
   exposed-modules:
     Hasql.Transaction
   build-depends:
-    hasql >= 0.17 && < 0.20,
     -- database:
-    postgresql-error-codes >= 1 && < 2,
+    hasql >= 0.17 && < 0.20,
     -- data:
     bytestring-tree-builder >= 0.1 && < 0.3,
     bytestring >= 0.10 && < 0.11,
