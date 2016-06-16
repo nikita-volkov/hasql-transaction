@@ -65,7 +65,10 @@ run (Transaction session) isolation mode =
     do
       resultEither <- do
         Session.query () (Queries.beginTransaction mode')
-        tryError session
+        tryError $ do
+          result <- session
+          Session.query () (bool Queries.abortTransaction Queries.commitTransaction commit)
+          return result
       case resultEither of
         Left error -> do
           Session.query () Queries.abortTransaction
@@ -75,7 +78,6 @@ run (Transaction session) isolation mode =
             _ -> 
               throwError error
         Right result -> do
-          Session.query () $ bool Queries.abortTransaction Queries.commitTransaction commit
           pure result
   where
     mode' =
