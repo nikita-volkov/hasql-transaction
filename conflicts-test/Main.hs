@@ -39,7 +39,7 @@ main =
         runTest test =
           test connection1 connection2
         tests =
-          [transactionsTest, transactionAndQueryTest]
+          [readAndWriteTransactionsTest, transactionsTest, transactionAndQueryTest]
 
 
 session connection session =
@@ -67,6 +67,21 @@ transactionsTest connection1 connection2 =
     traceShowM balance1
     traceShowM balance2
     return (balance1 == Just 2000 && balance2 == Just (-2000))
+
+readAndWriteTransactionsTest :: Test
+readAndWriteTransactionsTest connection1 connection2 =
+  do
+    id1 <- session connection1 (Session.query 0 Queries.createAccount)
+    id2 <- session connection1 (Session.query 0 Queries.createAccount)
+    async1 <- Async.async (replicateM_ 1000 (transaction connection1 (Transactions.transfer id1 id2 1)))
+    async2 <- Async.async (replicateM_ 1000 (transaction connection2 (Transaction.query id1 Queries.getBalance)))
+    Async.wait async1
+    Async.wait async2
+    balance1 <- session connection1 (Session.query id1 Queries.getBalance)
+    balance2 <- session connection1 (Session.query id2 Queries.getBalance)
+    traceShowM balance1
+    traceShowM balance2
+    return (balance1 == Just 1000 && balance2 == Just (-1000))
 
 transactionAndQueryTest :: Test
 transactionAndQueryTest connection1 connection2 =
