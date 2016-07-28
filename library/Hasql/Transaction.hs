@@ -12,9 +12,9 @@ module Hasql.Transaction
 where
 
 import Hasql.Transaction.Prelude
-import qualified Hasql.Query as Query
-import qualified Hasql.Session as Session
-import qualified Hasql.Transaction.Queries as Queries
+import qualified Hasql.Query as A
+import qualified Hasql.Session as B
+import qualified Hasql.Transaction.Queries as C
 
 
 -- |
@@ -24,7 +24,7 @@ import qualified Hasql.Transaction.Queries as Queries
 -- while automatically retrying the transaction in case of conflicts.
 -- Thus this abstraction closely reproduces the behaviour of 'STM'.
 newtype Transaction a =
-  Transaction (Session.Session a)
+  Transaction (B.Session a)
   deriving (Functor, Applicative, Monad)
 
 -- |
@@ -58,22 +58,22 @@ data IsolationLevel =
 -- |
 -- Execute the transaction using the provided isolation level and mode.
 {-# INLINABLE run #-}
-run :: Transaction a -> IsolationLevel -> Mode -> Session.Session a
+run :: Transaction a -> IsolationLevel -> Mode -> B.Session a
 run (Transaction session) isolation mode =
   fix $
   \ recur ->
     do
       resultEither <- do
-        Session.query () (Queries.beginTransaction mode')
+        B.query () (C.beginTransaction mode')
         tryError $ do
           result <- session
-          Session.query () (bool Queries.abortTransaction Queries.commitTransaction commit)
+          B.query () (bool C.abortTransaction C.commitTransaction commit)
           return result
       case resultEither of
         Left error -> do
-          Session.query () Queries.abortTransaction
+          B.query () C.abortTransaction
           case error of
-            Session.ResultError (Session.ServerError "40001" _ _ _) ->
+            B.ResultError (B.ServerError "40001" _ _ _) ->
               recur
             _ -> 
               throwError error
@@ -95,11 +95,11 @@ run (Transaction session) isolation mode =
 {-# INLINE sql #-}
 sql :: ByteString -> Transaction ()
 sql sql =
-  Transaction $ Session.sql sql
+  Transaction $ B.sql sql
 
 -- |
 -- Parameters and a specification of the parametric query to apply them to.
 {-# INLINE query #-}
-query :: a -> Query.Query a b -> Transaction b
+query :: a -> A.Query a b -> Transaction b
 query params query =
-  Transaction $ Session.query params query
+  Transaction $ B.query params query

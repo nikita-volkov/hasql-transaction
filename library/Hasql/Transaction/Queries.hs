@@ -2,10 +2,10 @@ module Hasql.Transaction.Queries
 where
 
 import Hasql.Transaction.Prelude
-import qualified Hasql.Query as HQ
-import qualified Hasql.Encoders as HE
-import qualified Hasql.Decoders as HD
-import qualified ByteString.TreeBuilder as TB
+import qualified Hasql.Query as A
+import qualified Hasql.Encoders as B
+import qualified Hasql.Decoders as C
+import qualified ByteString.TreeBuilder as D
 
 
 -- * Transactions
@@ -19,12 +19,12 @@ data Isolation =
 type TransactionMode =
   (Isolation, Bool)
 
-beginTransaction :: TransactionMode -> HQ.Query () ()
+beginTransaction :: TransactionMode -> A.Query () ()
 beginTransaction (isolation, write) =
-  HQ.statement sql HE.unit HD.unit True
+  A.statement sql B.unit C.unit True
   where
     sql =
-      TB.toByteString $
+      D.toByteString $
       mconcat $
       [
         "BEGIN "
@@ -41,39 +41,39 @@ beginTransaction (isolation, write) =
           False -> "READ ONLY"
       ]
 
-commitTransaction :: HQ.Query () ()
+commitTransaction :: A.Query () ()
 commitTransaction =
-  HQ.statement "commit" HE.unit HD.unit True
+  A.statement "commit" B.unit C.unit True
 
-abortTransaction :: HQ.Query () ()
+abortTransaction :: A.Query () ()
 abortTransaction =
-  HQ.statement "abort" HE.unit HD.unit True
+  A.statement "abort" B.unit C.unit True
 
 
 -- * Streaming
 -------------------------
 
-declareCursor :: ByteString -> ByteString -> HE.Params a -> HQ.Query a ()
+declareCursor :: ByteString -> ByteString -> B.Params a -> A.Query a ()
 declareCursor name sql encoder =
-  HQ.statement sql' encoder HD.unit False
+  A.statement sql' encoder C.unit False
   where
     sql' =
-      TB.toByteString $
-      "DECLARE " <> TB.byteString name <> " NO SCROLL CURSOR FOR " <> TB.byteString sql
+      D.toByteString $
+      "DECLARE " <> D.byteString name <> " NO SCROLL CURSOR FOR " <> D.byteString sql
 
-closeCursor :: HQ.Query ByteString ()
+closeCursor :: A.Query ByteString ()
 closeCursor =
-  HQ.statement "CLOSE $1" (HE.value HE.bytea) HD.unit True
+  A.statement "CLOSE $1" (B.value B.bytea) C.unit True
 
-fetchFromCursor :: (b -> a -> b) -> b -> HD.Row a -> HQ.Query (Int64, ByteString) b
+fetchFromCursor :: (b -> a -> b) -> b -> C.Row a -> A.Query (Int64, ByteString) b
 fetchFromCursor step init rowDec =
-  HQ.statement sql encoder decoder True
+  A.statement sql encoder decoder True
   where
     sql =
       "FETCH FORWARD $1 FROM $2"
     encoder =
       contrazip2
-        (HE.value HE.int8)
-        (HE.value HE.bytea)
+        (B.value B.int8)
+        (B.value B.bytea)
     decoder =
-      HD.foldlRows step init rowDec
+      C.foldlRows step init rowDec
