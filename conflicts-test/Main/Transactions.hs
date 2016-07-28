@@ -15,12 +15,15 @@ dropSchema =
   do
     query () A.dropAccountTable
 
-transfer :: Int64 -> Int64 -> Scientific -> Transaction ()
+transfer :: Int64 -> Int64 -> Scientific -> Transaction Bool
 transfer id1 id2 amount =
   do
-    query (id1, amount) A.modifyBalance
-    query (id2, negate amount) A.modifyBalance
-    return ()
+    success <- query (id1, amount) A.modifyBalance
+    if success
+      then
+        query (id2, negate amount) A.modifyBalance
+      else
+        return False
 
 transferTimes :: Int -> Int64 -> Int64 -> Scientific -> Transaction ()
 transferTimes times id1 id2 amount =
