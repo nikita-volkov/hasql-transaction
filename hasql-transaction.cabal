@@ -42,10 +42,12 @@ library
   default-language:
     Haskell2010
   other-modules:
-    Hasql.Transaction.Prelude
-    Hasql.Transaction.Queries
+    Hasql.Transaction.Private.Prelude
+    Hasql.Transaction.Private.Queries
+    Hasql.Transaction.Private.Transaction
   exposed-modules:
     Hasql.Transaction
+    Hasql.Transaction.Sessions
   build-depends:
     -- database:
     hasql >= 0.17 && < 0.20,

@@ -1,7 +1,7 @@
-module Hasql.Transaction.Queries
+module Hasql.Transaction.Private.Queries
 where
 
-import Hasql.Transaction.Prelude
+import Hasql.Transaction.Private.Prelude
 import qualified Hasql.Query as A
 import qualified Hasql.Encoders as B
 import qualified Hasql.Decoders as C

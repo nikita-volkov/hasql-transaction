@@ -4,6 +4,7 @@ import Rebase.Prelude
 import qualified Hasql.Connection as A
 import qualified Hasql.Session as B
 import qualified Hasql.Transaction as C
+import qualified Hasql.Transaction.Sessions as G
 import qualified Main.Queries as D
 import qualified Main.Transactions as E
 import qualified Control.Concurrent.Async as F
@@ -47,7 +48,7 @@ session connection session =
   either (fail . show) return
 
 transaction connection transaction =
-  session connection (C.run transaction C.RepeatableRead C.Write)
+  session connection (G.transaction C.RepeatableRead C.Write transaction)
 
 
 type Test =
