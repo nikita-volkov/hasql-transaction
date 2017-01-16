@@ -14,7 +14,7 @@ import qualified Hasql.Transaction.Private.Queries as C
 -- while automatically retrying the transaction in case of conflicts.
 -- Thus this abstraction closely reproduces the behaviour of 'STM'.
 newtype Transaction a =
-  Transaction (B.Session a)
+  Transaction (StateT Bool B.Session a)
   deriving (Functor, Applicative, Monad)
 
 -- |
@@ -56,7 +56,7 @@ run (Transaction session) isolation mode =
       resultEither <- do
         B.query () (C.beginTransaction mode')
         tryError $ do
-          result <- session
+          (result, _condemned) <- runStateT session False
           B.query () (bool C.abortTransaction C.commitTransaction commit)
           return result
       case resultEither of
@@ -85,11 +85,11 @@ run (Transaction session) isolation mode =
 {-# INLINE sql #-}
 sql :: ByteString -> Transaction ()
 sql sql =
-  Transaction $ B.sql sql
+  Transaction . lift $ B.sql sql
 
 -- |
 -- Parameters and a specification of the parametric query to apply them to.
 {-# INLINE query #-}
 query :: a -> A.Query a b -> Transaction b
 query params query =
-  Transaction $ B.query params query
+  Transaction . lift $ B.query params query
