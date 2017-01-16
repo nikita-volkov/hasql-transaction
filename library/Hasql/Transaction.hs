@@ -7,6 +7,7 @@ module Hasql.Transaction
   IsolationLevel(..),
   -- * Transaction monad
   Transaction,
+  condemn,
   sql,
   query,
 )
