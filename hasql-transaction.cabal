@@ -43,7 +43,10 @@ library
     Haskell2010
   other-modules:
     Hasql.Transaction.Private.Prelude
+    Hasql.Transaction.Private.Model
+    Hasql.Transaction.Private.SQL
     Hasql.Transaction.Private.Queries
+    Hasql.Transaction.Private.Sessions
     Hasql.Transaction.Private.Transaction
   exposed-modules:
     Hasql.Transaction

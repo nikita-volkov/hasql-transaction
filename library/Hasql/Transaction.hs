@@ -14,3 +14,4 @@ module Hasql.Transaction
 where
 
 import Hasql.Transaction.Private.Transaction
+import Hasql.Transaction.Private.Model

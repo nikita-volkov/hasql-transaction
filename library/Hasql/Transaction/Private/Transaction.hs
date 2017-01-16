@@ -2,9 +2,11 @@ module Hasql.Transaction.Private.Transaction
 where
 
 import Hasql.Transaction.Private.Prelude
+import Hasql.Transaction.Private.Model
 import qualified Hasql.Query as A
 import qualified Hasql.Session as B
 import qualified Hasql.Transaction.Private.Queries as C
+import qualified Hasql.Transaction.Private.Sessions as D
 
 
 -- |
@@ -18,68 +20,11 @@ newtype Transaction a =
   deriving (Functor, Applicative, Monad)
 
 -- |
---
-data Mode =
-  -- |
-  -- Read-only. No writes possible.
-  Read |
-  -- |
-  -- Write and commit.
-  Write |
-  -- |
-  -- Write without committing.
-  -- Useful for testing,
-  -- allowing you to modify your database,
-  -- producing some result based on your changes,
-  -- and letting Hasql roll all the changes back on the exit from the transaction.
-  WriteWithoutCommitting
-  deriving (Show, Eq, Ord, Enum, Bounded)
-
--- |
--- For reference see
--- <http://www.postgresql.org/docs/current/static/transaction-iso.html the Postgres' documentation>.
---
-data IsolationLevel =
-  ReadCommitted |
-  RepeatableRead |
-  Serializable
-  deriving (Show, Eq, Ord, Enum, Bounded)
-
--- |
 -- Execute the transaction using the provided isolation level and mode.
-{-# INLINABLE run #-}
+{-# INLINE run #-}
 run :: Transaction a -> IsolationLevel -> Mode -> B.Session a
 run (Transaction session) isolation mode =
-  fix $
-  \ recur ->
-    do
-      resultEither <- do
-        B.query () (C.beginTransaction mode')
-        tryError $ do
-          (result, condemned) <- runStateT session False
-          B.query () $
-            if commit && not condemned
-              then C.commitTransaction
-              else C.abortTransaction
-          return result
-      case resultEither of
-        Left error -> do
-          B.query () C.abortTransaction
-          case error of
-            B.ResultError (B.ServerError "40001" _ _ _) ->
-              recur
-            _ ->
-              throwError error
-        Right result -> do
-          pure result
-  where
-    mode' =
-      (unsafeCoerce isolation, write)
-    (write, commit) =
-      case mode of
-        Read -> (False, True)
-        Write -> (True, True)
-        WriteWithoutCommitting -> (True, False)
+  D.inRetryingTransaction isolation mode (runStateT session True)
 
 -- |
 -- Possibly a multi-statement query,
@@ -87,7 +32,8 @@ run (Transaction session) isolation mode =
 -- nor can any results of it be collected.
 {-# INLINE sql #-}
 sql :: ByteString -> Transaction ()
-sql = Transaction . lift . B.sql
+sql =
+  Transaction . lift . B.sql
 
 -- |
 -- Parameters and a specification of the parametric query to apply them to.
@@ -97,7 +43,8 @@ query params query =
   Transaction . lift $ B.query params query
 
 -- |
--- Cause transaction to eventually roll back
+-- Cause transaction to eventually roll back.
 {-# INLINE condemn #-}
 condemn :: Transaction ()
-condemn = Transaction $ put True
+condemn =
+  Transaction $ put False

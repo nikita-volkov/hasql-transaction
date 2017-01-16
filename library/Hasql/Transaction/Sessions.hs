@@ -6,11 +6,12 @@ where
 
 import qualified Hasql.Transaction.Private.Transaction as A
 import qualified Hasql.Session as B
+import qualified Hasql.Transaction.Private.Model as C
 
 
 -- |
 -- Execute the transaction using the provided isolation level and mode.
 {-# INLINE transaction #-}
-transaction :: A.IsolationLevel -> A.Mode -> A.Transaction a -> B.Session a
+transaction :: C.IsolationLevel -> C.Mode -> A.Transaction a -> B.Session a
 transaction isolation mode transaction =
   A.run transaction isolation mode

@@ -2,52 +2,27 @@ module Hasql.Transaction.Private.Queries
 where
 
 import Hasql.Transaction.Private.Prelude
+import Hasql.Transaction.Private.Model
 import qualified Hasql.Query as A
 import qualified Hasql.Encoders as B
 import qualified Hasql.Decoders as C
-import qualified ByteString.TreeBuilder as D
+import qualified Hasql.Transaction.Private.SQL as D
 
 
 -- * Transactions
 -------------------------
 
-data Isolation =
-  ReadCommitted |
-  RepeatableRead |
-  Serializable 
-
-type TransactionMode =
-  (Isolation, Bool)
-
-beginTransaction :: TransactionMode -> A.Query () ()
-beginTransaction (isolation, write) =
-  A.statement sql B.unit C.unit True
-  where
-    sql =
-      D.toByteString $
-      mconcat $
-      [
-        "BEGIN "
-        ,
-        case isolation of
-          ReadCommitted  -> "ISOLATION LEVEL READ COMMITTED"
-          RepeatableRead -> "ISOLATION LEVEL REPEATABLE READ"
-          Serializable   -> "ISOLATION LEVEL SERIALIZABLE"
-        ,
-        " "
-        ,
-        case write of
-          True  -> "READ WRITE"
-          False -> "READ ONLY"
-      ]
+beginTransaction :: IsolationLevel -> Mode -> A.Query () ()
+beginTransaction isolation mode =
+  A.statement (D.beginTransaction isolation mode) B.unit C.unit True
 
 commitTransaction :: A.Query () ()
 commitTransaction =
-  A.statement "commit" B.unit C.unit True
+  A.statement "COMMIT" B.unit C.unit True
 
 abortTransaction :: A.Query () ()
 abortTransaction =
-  A.statement "abort" B.unit C.unit True
+  A.statement "ABORT" B.unit C.unit True
 
 
 -- * Streaming
@@ -55,11 +30,7 @@ abortTransaction =
 
 declareCursor :: ByteString -> ByteString -> B.Params a -> A.Query a ()
 declareCursor name sql encoder =
-  A.statement sql' encoder C.unit False
-  where
-    sql' =
-      D.toByteString $
-      "DECLARE " <> D.byteString name <> " NO SCROLL CURSOR FOR " <> D.byteString sql
+  A.statement (D.declareCursor name sql) encoder C.unit False
 
 closeCursor :: A.Query ByteString ()
 closeCursor =
