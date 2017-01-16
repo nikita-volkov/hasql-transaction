@@ -56,8 +56,11 @@ run (Transaction session) isolation mode =
       resultEither <- do
         B.query () (C.beginTransaction mode')
         tryError $ do
-          (result, _condemned) <- runStateT session False
-          B.query () (bool C.abortTransaction C.commitTransaction commit)
+          (result, condemned) <- runStateT session False
+          B.query () $
+            if commit && not condemned
+              then C.commitTransaction
+              else C.abortTransaction
           return result
       case resultEither of
         Left error -> do
@@ -84,8 +87,7 @@ run (Transaction session) isolation mode =
 -- nor can any results of it be collected.
 {-# INLINE sql #-}
 sql :: ByteString -> Transaction ()
-sql sql =
-  Transaction . lift $ B.sql sql
+sql = Transaction . lift . B.sql
 
 -- |
 -- Parameters and a specification of the parametric query to apply them to.
@@ -93,3 +95,9 @@ sql sql =
 query :: a -> A.Query a b -> Transaction b
 query params query =
   Transaction . lift $ B.query params query
+
+-- |
+-- Cause transaction to eventually roll back
+{-# INLINE condemn #-}
+condemn :: Transaction ()
+condemn = Transaction $ put True
