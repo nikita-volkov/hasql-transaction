@@ -9,7 +9,7 @@ import qualified Hasql.Transaction.Private.Queries as C
 
 -- |
 -- A composable abstraction over the retryable transactions.
--- 
+--
 -- Executes multiple queries under the specified mode and isolation level,
 -- while automatically retrying the transaction in case of conflicts.
 -- Thus this abstraction closely reproduces the behaviour of 'STM'.
@@ -18,7 +18,7 @@ newtype Transaction a =
   deriving (Functor, Applicative, Monad)
 
 -- |
--- 
+--
 data Mode =
   -- |
   -- Read-only. No writes possible.
@@ -28,8 +28,8 @@ data Mode =
   Write |
   -- |
   -- Write without committing.
-  -- Useful for testing, 
-  -- allowing you to modify your database, 
+  -- Useful for testing,
+  -- allowing you to modify your database,
   -- producing some result based on your changes,
   -- and letting Hasql roll all the changes back on the exit from the transaction.
   WriteWithoutCommitting
@@ -38,7 +38,7 @@ data Mode =
 -- |
 -- For reference see
 -- <http://www.postgresql.org/docs/current/static/transaction-iso.html the Postgres' documentation>.
--- 
+--
 data IsolationLevel =
   ReadCommitted |
   RepeatableRead |
@@ -65,7 +65,7 @@ run (Transaction session) isolation mode =
           case error of
             B.ResultError (B.ServerError "40001" _ _ _) ->
               recur
-            _ -> 
+            _ ->
               throwError error
         Right result -> do
           pure result
