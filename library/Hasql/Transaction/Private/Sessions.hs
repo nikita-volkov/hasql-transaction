@@ -7,6 +7,11 @@ import qualified Hasql.Session as A
 import qualified Hasql.Transaction.Private.Queries as B
 
 
+{-
+We may want to
+do one transaction retry in case of the 23505 error, and fail if an identical
+error is seen.
+-}
 inRetryingTransaction :: IsolationLevel -> Mode -> A.Session (a, Bool) -> A.Session a
 inRetryingTransaction isolation mode session =
   fix $ \recur -> catchError normal (onError recur)
