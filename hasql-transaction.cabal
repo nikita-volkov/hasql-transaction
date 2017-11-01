@@ -1,7 +1,7 @@
 name:
   hasql-transaction
 version:
-  0.5.1
+  0.5.2
 category:
   Hasql, Database, PostgreSQL
 synopsis:
@@ -53,7 +53,7 @@ library
     Hasql.Transaction.Sessions
   build-depends:
     -- database:
-    hasql >= 0.17 && < 0.20 || >= 1 && < 1.1,
+    hasql >= 0.19 && < 0.20 || >= 1 && < 2,
     -- data:
     bytestring-tree-builder >= 0.1 && < 0.3,
     bytestring >= 0.10 && < 0.11,
