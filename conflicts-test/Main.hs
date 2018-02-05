@@ -48,7 +48,7 @@ session connection session =
   either (fail . show) return
 
 transaction connection transaction =
-  session connection (G.transaction C.RepeatableRead C.Write transaction)
+  session connection (G.transaction G.RepeatableRead G.Write transaction)
 
 
 type Test =

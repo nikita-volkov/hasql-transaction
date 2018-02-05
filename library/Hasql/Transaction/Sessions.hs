@@ -1,6 +1,9 @@
 module Hasql.Transaction.Sessions
 (
   transaction,
+  -- * Transaction settings
+  C.Mode(..),
+  C.IsolationLevel(..),
 )
 where
 
