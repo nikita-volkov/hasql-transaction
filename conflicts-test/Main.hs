@@ -5,7 +5,7 @@ import qualified Hasql.Connection as A
 import qualified Hasql.Session as B
 import qualified Hasql.Transaction as C
 import qualified Hasql.Transaction.Sessions as G
-import qualified Main.Queries as D
+import qualified Main.Statements as D
 import qualified Main.Transactions as E
 import qualified Control.Concurrent.Async as F
 
@@ -57,14 +57,14 @@ type Test =
 transactionsTest :: Test
 transactionsTest connection1 connection2 =
   do
-    id1 <- session connection1 (B.query 0 D.createAccount)
-    id2 <- session connection1 (B.query 0 D.createAccount)
+    id1 <- session connection1 (B.statement 0 D.createAccount)
+    id2 <- session connection1 (B.statement 0 D.createAccount)
     async1 <- F.async (replicateM_ 1000 (transaction connection1 (E.transfer id1 id2 1)))
     async2 <- F.async (replicateM_ 1000 (transaction connection2 (E.transfer id1 id2 1)))
     F.wait async1
     F.wait async2
-    balance1 <- session connection1 (B.query id1 D.getBalance)
-    balance2 <- session connection1 (B.query id2 D.getBalance)
+    balance1 <- session connection1 (B.statement id1 D.getBalance)
+    balance2 <- session connection1 (B.statement id2 D.getBalance)
     traceShowM balance1
     traceShowM balance2
     return (balance1 == Just 2000 && balance2 == Just (-2000))
@@ -72,14 +72,14 @@ transactionsTest connection1 connection2 =
 readAndWriteTransactionsTest :: Test
 readAndWriteTransactionsTest connection1 connection2 =
   do
-    id1 <- session connection1 (B.query 0 D.createAccount)
-    id2 <- session connection1 (B.query 0 D.createAccount)
+    id1 <- session connection1 (B.statement 0 D.createAccount)
+    id2 <- session connection1 (B.statement 0 D.createAccount)
     async1 <- F.async (replicateM_ 1000 (transaction connection1 (E.transfer id1 id2 1)))
-    async2 <- F.async (replicateM_ 1000 (transaction connection2 (C.query id1 D.getBalance)))
+    async2 <- F.async (replicateM_ 1000 (transaction connection2 (C.statement id1 D.getBalance)))
     F.wait async1
     F.wait async2
-    balance1 <- session connection1 (B.query id1 D.getBalance)
-    balance2 <- session connection1 (B.query id2 D.getBalance)
+    balance1 <- session connection1 (B.statement id1 D.getBalance)
+    balance2 <- session connection1 (B.statement id2 D.getBalance)
     traceShowM balance1
     traceShowM balance2
     return (balance1 == Just 1000 && balance2 == Just (-1000))
@@ -87,14 +87,14 @@ readAndWriteTransactionsTest connection1 connection2 =
 transactionAndQueryTest :: Test
 transactionAndQueryTest connection1 connection2 =
   do
-    id1 <- session connection1 (B.query 0 D.createAccount)
-    id2 <- session connection1 (B.query 0 D.createAccount)
+    id1 <- session connection1 (B.statement 0 D.createAccount)
+    id2 <- session connection1 (B.statement 0 D.createAccount)
     async1 <- F.async (transaction connection1 (E.transferTimes 200 id1 id2 1))
-    async2 <- F.async (session connection2 (replicateM_ 200 (B.query (id1, 1) D.modifyBalance)))
+    async2 <- F.async (session connection2 (replicateM_ 200 (B.statement (id1, 1) D.modifyBalance)))
     F.wait async1
     F.wait async2
-    balance1 <- session connection1 (B.query id1 D.getBalance)
-    balance2 <- session connection1 (B.query id2 D.getBalance)
+    balance1 <- session connection1 (B.statement id1 D.getBalance)
+    balance2 <- session connection1 (B.statement id2 D.getBalance)
     traceShowM balance1
     traceShowM balance2
     return (balance1 == Just 400 && balance2 == Just (-200))

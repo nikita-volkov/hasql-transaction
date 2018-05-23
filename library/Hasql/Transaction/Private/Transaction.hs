@@ -3,9 +3,9 @@ where
 
 import Hasql.Transaction.Private.Prelude
 import Hasql.Transaction.Private.Model
-import qualified Hasql.Query as A
+import qualified Hasql.Statement as A
 import qualified Hasql.Session as B
-import qualified Hasql.Transaction.Private.Queries as C
+import qualified Hasql.Transaction.Private.Statements as C
 import qualified Hasql.Transaction.Private.Sessions as D
 
 
@@ -37,10 +37,10 @@ sql =
 
 -- |
 -- Parameters and a specification of the parametric query to apply them to.
-{-# INLINE query #-}
-query :: a -> A.Query a b -> Transaction b
-query params query =
-  Transaction . lift $ B.query params query
+{-# INLINE statement #-}
+statement :: a -> A.Statement a b -> Transaction b
+statement params statement =
+  Transaction . lift $ B.statement params statement
 
 -- |
 -- Cause transaction to eventually roll back.

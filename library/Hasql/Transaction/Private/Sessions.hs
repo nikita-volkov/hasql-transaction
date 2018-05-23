@@ -4,7 +4,7 @@ where
 import Hasql.Transaction.Private.Prelude
 import Hasql.Transaction.Private.Model
 import qualified Hasql.Session as A
-import qualified Hasql.Transaction.Private.Queries as B
+import qualified Hasql.Transaction.Private.Statements as B
 
 
 {-
@@ -18,17 +18,17 @@ inRetryingTransaction isolation mode session =
   where
     normal =
       do
-        A.query () (B.beginTransaction isolation mode)
+        A.statement () (B.beginTransaction isolation mode)
         (result, commit) <- session
         if commit
-          then A.query () B.commitTransaction
-          else A.query () B.abortTransaction
+          then A.statement () B.commitTransaction
+          else A.statement () B.abortTransaction
         return result
     onError continue error =
       do
-        A.query () B.abortTransaction
+        A.statement () B.abortTransaction
         case error of
-          A.ResultError (A.ServerError "40001" _ _ _) ->
+          A.QueryError _ _ (A.ResultError (A.ServerError "40001" _ _ _)) ->
             continue
           _ ->
             throwError error
