@@ -35,6 +35,10 @@ import Contravariant.Extras as Exports
 -------------------------
 import Data.ByteString as Exports (ByteString)
 
+-- semigroups / base
+-------------------------
+import Data.Semigroup as Exports
+
 tryError :: MonadError e m => m a -> m (Either e a)
 tryError m =
   catchError (liftM Right m) (return . Left)

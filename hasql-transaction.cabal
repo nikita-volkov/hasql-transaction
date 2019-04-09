@@ -63,6 +63,7 @@ library
     mtl >= 2 && < 3,
     transformers >= 0.3 && < 0.6,
     -- general:
+    semigroups >= 0.3.0,
     base-prelude >= 0.1.19 && < 2,
     base >= 4.6 && < 5
 
