@@ -19,6 +19,13 @@ newtype Transaction a =
   Transaction (StateT Bool B.Session a)
   deriving (Functor, Applicative, Monad)
 
+instance Semigroup a => Semigroup (Transaction a) where
+  (<>) = liftA2 (<>)
+
+instance Monoid a => Monoid (Transaction a) where
+  mempty = pure mempty
+  mappend = liftA2 mappend
+
 -- |
 -- Execute the transaction using the provided isolation level and mode.
 {-# INLINE run #-}
