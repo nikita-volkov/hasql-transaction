@@ -63,9 +63,9 @@ library
     mtl >= 2 && < 3,
     transformers >= 0.3 && < 0.6,
     -- general:
-    semigroups >= 0.3.0,
+    semigroups >= 0.3 && < 0.19,
     base-prelude >= 0.1.19 && < 2,
-    base >= 4.6 && < 5
+    base >= 4.9 && < 5
 
 
 test-suite conflicts-test
