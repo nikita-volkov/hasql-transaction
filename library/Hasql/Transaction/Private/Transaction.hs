@@ -50,6 +50,13 @@ statement params statement =
   Transaction . lift $ B.statement params statement
 
 -- |
+-- Run a 'B.Session' in a 'Transaction'.
+{-# INLINE session #-}
+session :: B.Session a -> Transaction a
+session =
+  Transaction . lift
+
+-- |
 -- Cause transaction to eventually roll back.
 {-# INLINE condemn #-}
 condemn :: Transaction ()
