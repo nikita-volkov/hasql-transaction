@@ -14,15 +14,15 @@ import qualified Hasql.Transaction.Private.SQL as D
 
 beginTransaction :: IsolationLevel -> Mode -> A.Statement () ()
 beginTransaction isolation mode =
-  A.Statement (D.beginTransaction isolation mode) B.unit C.unit True
+  A.Statement (D.beginTransaction isolation mode) B.noParams C.noResult True
 
 commitTransaction :: A.Statement () ()
 commitTransaction =
-  A.Statement "COMMIT" B.unit C.unit True
+  A.Statement "COMMIT" B.noParams C.noResult True
 
 abortTransaction :: A.Statement () ()
 abortTransaction =
-  A.Statement "ABORT" B.unit C.unit True
+  A.Statement "ABORT" B.noParams C.noResult True
 
 
 -- * Streaming
@@ -30,11 +30,11 @@ abortTransaction =
 
 declareCursor :: ByteString -> ByteString -> B.Params a -> A.Statement a ()
 declareCursor name sql encoder =
-  A.Statement (D.declareCursor name sql) encoder C.unit False
+  A.Statement (D.declareCursor name sql) encoder C.noResult False
 
 closeCursor :: A.Statement ByteString ()
 closeCursor =
-  A.Statement "CLOSE $1" (B.param B.bytea) C.unit True
+  A.Statement "CLOSE $1" ((B.param . B.nonNullable) B.bytea) C.noResult True
 
 fetchFromCursor :: (b -> a -> b) -> b -> C.Row a -> A.Statement (Int64, ByteString) b
 fetchFromCursor step init rowDec =
@@ -44,7 +44,7 @@ fetchFromCursor step init rowDec =
       "FETCH FORWARD $1 FROM $2"
     encoder =
       contrazip2
-        (B.param B.int8)
-        (B.param B.bytea)
+        ((B.param . B.nonNullable) B.int8)
+        ((B.param . B.nonNullable) B.bytea)
     decoder =
       C.foldlRows step init rowDec
