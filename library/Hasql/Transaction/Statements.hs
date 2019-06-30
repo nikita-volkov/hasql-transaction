@@ -3,7 +3,7 @@ where
 
 import Hasql.Transaction.Prelude
 import Hasql.Transaction.Model
-import qualified Hasql.Statement as A
+import Hasql.Statement
 import qualified Hasql.Encoders as B
 import qualified Hasql.Decoders as C
 import qualified Hasql.Transaction.Sql as D
@@ -12,33 +12,33 @@ import qualified Hasql.Transaction.Sql as D
 -- * Transactions
 -------------------------
 
-beginTransaction :: IsolationLevel -> Mode -> A.Statement () ()
+beginTransaction :: IsolationLevel -> Mode -> Statement () ()
 beginTransaction isolation mode =
-  A.Statement (D.beginTransaction isolation mode) B.noParams C.noResult True
+  Statement (D.beginTransaction isolation mode) B.noParams C.noResult True
 
-commitTransaction :: A.Statement () ()
+commitTransaction :: Statement () ()
 commitTransaction =
-  A.Statement "COMMIT" B.noParams C.noResult True
+  Statement "COMMIT" B.noParams C.noResult True
 
-abortTransaction :: A.Statement () ()
+abortTransaction :: Statement () ()
 abortTransaction =
-  A.Statement "ABORT" B.noParams C.noResult True
+  Statement "ABORT" B.noParams C.noResult True
 
 
 -- * Streaming
 -------------------------
 
-declareCursor :: ByteString -> ByteString -> B.Params a -> A.Statement a ()
+declareCursor :: ByteString -> ByteString -> B.Params a -> Statement a ()
 declareCursor name sql encoder =
-  A.Statement (D.declareCursor name sql) encoder C.noResult False
+  Statement (D.declareCursor name sql) encoder C.noResult False
 
-closeCursor :: A.Statement ByteString ()
+closeCursor :: Statement ByteString ()
 closeCursor =
-  A.Statement "CLOSE $1" ((B.param . B.nonNullable) B.bytea) C.noResult True
+  Statement "CLOSE $1" ((B.param . B.nonNullable) B.bytea) C.noResult True
 
-fetchFromCursor :: (b -> a -> b) -> b -> C.Row a -> A.Statement (Int64, ByteString) b
+fetchFromCursor :: (b -> a -> b) -> b -> C.Row a -> Statement (Int64, ByteString) b
 fetchFromCursor step init rowDec =
-  A.Statement sql encoder decoder True
+  Statement sql encoder decoder True
   where
     sql =
       "FETCH FORWARD $1 FROM $2"
