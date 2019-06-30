@@ -1,12 +1,12 @@
-module Hasql.Transaction.Private.Statements
+module Hasql.Transaction.Statements
 where
 
-import Hasql.Transaction.Private.Prelude
-import Hasql.Transaction.Private.Model
+import Hasql.Transaction.Prelude
+import Hasql.Transaction.Model
 import qualified Hasql.Statement as A
 import qualified Hasql.Encoders as B
 import qualified Hasql.Decoders as C
-import qualified Hasql.Transaction.Private.SQL as D
+import qualified Hasql.Transaction.Sql as D
 
 
 -- * Transactions

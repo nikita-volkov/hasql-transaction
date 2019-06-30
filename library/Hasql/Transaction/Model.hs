@@ -1,7 +1,7 @@
-module Hasql.Transaction.Private.Model
+module Hasql.Transaction.Model
 where
 
-import Hasql.Transaction.Private.Prelude
+import Hasql.Transaction.Prelude
 
 -- |
 --

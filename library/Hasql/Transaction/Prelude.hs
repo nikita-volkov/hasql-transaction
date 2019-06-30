@@ -1,4 +1,4 @@
-module Hasql.Transaction.Private.Prelude
+module Hasql.Transaction.Prelude
 ( 
   module Exports,
   tryError,

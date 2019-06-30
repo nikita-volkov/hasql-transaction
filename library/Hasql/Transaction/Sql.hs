@@ -1,8 +1,8 @@
-module Hasql.Transaction.Private.SQL
+module Hasql.Transaction.Sql
 where
 
-import Hasql.Transaction.Private.Prelude
-import Hasql.Transaction.Private.Model
+import Hasql.Transaction.Prelude
+import Hasql.Transaction.Model
 import qualified ByteString.TreeBuilder as D
 
 
