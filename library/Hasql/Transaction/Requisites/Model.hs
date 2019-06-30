@@ -24,7 +24,7 @@ Transaction isolation level.
 For reference see
 <http://www.postgresql.org/docs/current/static/transaction-iso.html the Postgres' documentation>.
 -}
-data IsolationLevel =
+data Level =
   ReadCommitted |
   RepeatableRead |
   Serializable

@@ -4,6 +4,7 @@ import Hasql.Transaction.Prelude
 import Hasql.Transaction.Requisites.Model
 import Hasql.Session (Session)
 import Hasql.Statement (Statement)
+import qualified Hasql.Session as Session
 
 
 {-|
@@ -16,7 +17,7 @@ while composing transactions in such a way that one can depend on the result of 
 A monadic interface wouldn't allow us to do the first.
 -}
 data Transaction i o =
-  Transaction Mode IsolationLevel (i -> StateT Condemnation Session o)
+  Transaction Mode Level (i -> StateT Condemnation Session o)
 
 deriving instance Functor (Transaction i)
 
@@ -74,18 +75,24 @@ mapSession ::
 mapSession sessionFn (Transaction mode isolation session) = Transaction mode isolation (sessionFn session)
 
 {-|
-It goes without saying that the statement must not be transaction-related
+Cause transaction to eventually roll back.
+-}
+condemn :: Transaction () ()
+condemn = Transaction Read ReadCommitted (\ _ -> put Condemned)
+
+{-|
+It goes without saying that SQL must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-sql :: Mode -> IsolationLevel -> ByteString -> Transaction () ()
-sql = error "TODO"
+sql :: Mode -> Level -> ByteString -> Transaction () ()
+sql mode level sql = session mode level (\ _ -> Session.sql sql)
 
 {-|
 It goes without saying that the statement must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-statement :: Mode -> IsolationLevel -> Statement i o -> Transaction i o
-statement = error "TODO"
+statement :: Mode -> Level -> Statement i o -> Transaction i o
+statement mode level statement = session mode level (\ input -> Session.statement input statement)
 
 {-|
 You must know that it is possible to break the abstraction,
@@ -97,5 +104,5 @@ It's best for them to be defined as internal definitions inside of
 your transactions, so that its stored in the same place and
 is not possible to be affected by outside changes or be used elsewhere.
 -}
-session :: Mode -> IsolationLevel -> (i -> Session o) -> Transaction i o
-session = error "TODO"
+session :: Mode -> Level -> (i -> Session o) -> Transaction i o
+session mode level session = Transaction mode level (lift . session)
