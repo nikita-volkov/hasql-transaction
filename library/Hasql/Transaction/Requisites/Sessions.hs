@@ -15,17 +15,17 @@ import qualified ListT
 import qualified Hasql.Transaction.Requisites.Statements as Statements
 
 
-inRetryingTransaction :: Mode -> IsolationLevel -> ListT (StateT Condemnation Session) a -> Session a
-inRetryingTransaction mode level session =
+inRetryingTransaction :: Mode -> IsolationLevel -> [Session (a, Condemnation)] -> Session (Maybe a)
+inRetryingTransaction mode level sessions =
   let
-    loop session = do
-      tryTransaction mode level (runStateT (ListT.uncons session) Uncondemned) >>= \ case
-        Just unconsingResult -> case unconsingResult of
-          Just (a, nextListT) -> undefined
-          Nothing -> undefined
-        Nothing -> error "TODO: Handle conflict"
-      undefined
-    in loop session
+    loop = \ case
+      session : sessionsTail -> tryTransaction mode level session >>= \ case
+        Just a -> return (Just a)
+        Nothing -> loop sessionsTail
+      _ -> case sessions of
+        _ : _ -> loop sessions
+        _ -> return Nothing
+    in loop sessions
 
 tryTransaction :: Mode -> IsolationLevel -> Session (a, Condemnation) -> Session (Maybe a)
 tryTransaction mode level session = do
