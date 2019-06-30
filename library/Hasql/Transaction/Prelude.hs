@@ -81,9 +81,30 @@ import Control.Monad.Trans.Maybe as Exports hiding (liftListen, liftPass)
 import Control.Monad.Trans.Reader as Exports hiding (liftCallCC, liftCatch)
 import Control.Monad.Trans.State.Strict as Exports hiding (liftCallCC, liftCatch, liftListen, liftPass)
 
+-- semigroupoids
+-------------------------
+import Data.Bifunctor.Apply as Exports hiding (first, second)
+import Data.Functor.Alt as Exports hiding (($>), many, some, optional)
+import Data.Functor.Apply as Exports hiding (($>))
+import Data.Functor.Bind as Exports hiding (join, ($>))
+import Data.Functor.Extend as Exports
+import Data.Functor.Plus as Exports hiding (($>), some, many, optional)
+import Data.Semigroup.Bifoldable as Exports
+import Data.Semigroup.Bitraversable as Exports
+import Data.Semigroup.Foldable as Exports
+import Data.Semigroup.Traversable as Exports
+import Data.Semigroupoid as Exports (Semigroupoid(..))
+
 -- mtl
 -------------------------
 import Control.Monad.Error.Class as Exports (MonadError (..))
+
+-- profunctors
+-------------------------
+import Data.Profunctor.Unsafe as Exports
+import Data.Profunctor.Choice as Exports
+import Data.Profunctor.Strong as Exports
+
 
 -- contravariant
 -------------------------
