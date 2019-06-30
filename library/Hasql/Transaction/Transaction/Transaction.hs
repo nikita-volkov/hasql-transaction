@@ -1,6 +1,6 @@
 module Hasql.Transaction.Transaction.Transaction where
 
-import Hasql.Transaction.Prelude
+import Hasql.Transaction.Prelude hiding (map)
 import Hasql.Transaction.Requisites.Model
 import Hasql.Session (Session)
 import Hasql.Statement (Statement)
@@ -16,7 +16,7 @@ while composing transactions in such a way that one can depend on the result of 
 A monadic interface wouldn't allow us to do the first.
 -}
 data Transaction i o =
-  Transaction Mode IsolationLevel (i -> StateT Condemnation Session o)
+  Transaction Mode IsolationLevel (i -> ListT (StateT Condemnation Session) o)
 
 deriving instance Functor (Transaction i)
 
@@ -24,8 +24,12 @@ instance Applicative (Transaction i) where
   pure = Transaction Read ReadCommitted . const . pure
   (<*>) = binOp $ \ lSession rSession i -> lSession i <*> rSession i
 
+instance Alternative (Transaction i) where
+  empty = Transaction Read ReadCommitted (const empty)
+  (<|>) = binOp $ \ lSession rSession i -> lSession i <|> rSession i
+
 instance Profunctor Transaction where
-  dimap fn1 fn2 = mapSession $ \ session -> fmap fn2 . session . fn1
+  dimap fn1 fn2 = map $ \ session -> fmap fn2 . session . fn1
 
 instance Strong Transaction where
   first' = first
@@ -49,6 +53,12 @@ instance Arrow Transaction where
 instance ArrowChoice Transaction where
   (+++) = binOp $ \ lSession rSession -> either (fmap Left . lSession) (fmap Right . rSession)
 
+instance ArrowZero Transaction where
+  zeroArrow = empty
+
+instance ArrowPlus Transaction where
+  (<+>) = (<|>)
+
 {-|
 Because mode and isolation are always composed the same way,
 we can focus on composing just the sessions.
@@ -56,9 +66,9 @@ we can focus on composing just the sessions.
 {-# INLINE binOp #-}
 binOp ::
   (
-    (li -> StateT Condemnation Session lo) ->
-    (ri -> StateT Condemnation Session ro) ->
-    (i -> StateT Condemnation Session o)
+    (li -> ListT (StateT Condemnation Session) lo) ->
+    (ri -> ListT (StateT Condemnation Session) ro) ->
+    (i -> ListT (StateT Condemnation Session) o)
   ) ->
   Transaction li lo -> Transaction ri ro -> Transaction i o
 binOp composeSessions (Transaction lMode lIsolation lSession) (Transaction rMode rIsolation rSession) = let
@@ -67,11 +77,11 @@ binOp composeSessions (Transaction lMode lIsolation lSession) (Transaction rMode
   session = composeSessions lSession rSession
   in Transaction mode isolation session
 
-{-# INLINE mapSession #-}
-mapSession ::
-  ((i1 -> StateT Condemnation Session o1) -> (i2 -> StateT Condemnation Session o2)) ->
+{-# INLINE map #-}
+map ::
+  ((i1 -> ListT (StateT Condemnation Session) o1) -> (i2 -> ListT (StateT Condemnation Session) o2)) ->
   Transaction i1 o1 -> Transaction i2 o2
-mapSession sessionFn (Transaction mode isolation session) = Transaction mode isolation (sessionFn session)
+map sessionFn (Transaction mode isolation session) = Transaction mode isolation (sessionFn session)
 
 {-|
 It goes without saying that the statement must not be transaction-related

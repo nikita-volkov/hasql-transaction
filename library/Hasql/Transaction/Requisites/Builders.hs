@@ -6,8 +6,8 @@ import Hasql.Transaction.Requisites.Model
 import ByteString.StrictBuilder
 
 
-beginTransaction :: IsolationLevel -> Mode -> Builder
-beginTransaction isolationLevel_ mode_ =
+beginTransaction :: Mode -> IsolationLevel -> Builder
+beginTransaction mode_ isolationLevel_ =
   "begin " <> isolationLevel isolationLevel_ <> " " <> mode mode_
 
 isolationLevel :: IsolationLevel -> Builder
