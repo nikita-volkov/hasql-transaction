@@ -23,6 +23,7 @@ library
   exposed-modules:
     Hasql.Transaction.Session
     Hasql.Transaction.Transaction
+    Hasql.Transaction.AltTransaction
   other-modules:
     Hasql.Transaction.Prelude
     Hasql.Transaction.Requisites.Model

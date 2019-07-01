@@ -5,12 +5,14 @@ Can be used imported in the same namespace as @Hasql.Session@ without conflicts.
 module Hasql.Transaction.Session
 (
   transaction,
+  altTransaction,
   {-* Reexports of non-conflicting types -}
   {-|
   Despite them not being rendered in the docs here we also reexport
   the following types for you to specify lesser imports:
   
   * `Reexports.Transaction`
+  * `Reexports.AltTransaction`
   -}
   module Reexports,
 )
@@ -23,6 +25,7 @@ import Hasql.Session
 import qualified Hasql.Transaction.AltTransaction.Defs as AltTransaction
 import qualified Hasql.Transaction.Transaction.Transaction as Transaction
 import qualified Hasql.Transaction.Transaction.Transaction as Reexports (Transaction)
+import qualified Hasql.Transaction.AltTransaction.Defs as Reexports (AltTransaction)
 
 
 {-|
