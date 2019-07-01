@@ -1,4 +1,4 @@
-module Hasql.Transaction.Transaction.Transaction where
+module Hasql.Transaction.AltTransaction.Defs where
 
 import Hasql.Transaction.Prelude hiding (map)
 import Hasql.Transaction.Requisites.Model
@@ -16,49 +16,49 @@ Arrow allows us to determine the read mode and isolation level,
 while composing transactions in such a way that one can depend on the result of the other.
 A monadic interface wouldn't allow us to do the first.
 -}
-data Transaction i o =
-  Transaction Mode IsolationLevel [i -> StateT Condemnation Session o]
+data AltTransaction i o =
+  AltTransaction Mode IsolationLevel [i -> StateT Condemnation Session o]
 
-deriving instance Functor (Transaction i)
+deriving instance Functor (AltTransaction i)
 
-instance Applicative (Transaction i) where
-  pure = Transaction Read ReadCommitted . pure . const . pure
+instance Applicative (AltTransaction i) where
+  pure = AltTransaction Read ReadCommitted . pure . const . pure
   (<*>) = binOp $ \ lSession rSession i -> lSession i <*> rSession i
 
-instance Alternative (Transaction i) where
-  empty = Transaction Read ReadCommitted []
-  (<|>) (Transaction lMode lLevel lList) (Transaction rMode rLevel rList) =
-    Transaction (max lMode rMode) (max lLevel rLevel) (lList <> rList)
+instance Alternative (AltTransaction i) where
+  empty = AltTransaction Read ReadCommitted []
+  (<|>) (AltTransaction lMode lLevel lList) (AltTransaction rMode rLevel rList) =
+    AltTransaction (max lMode rMode) (max lLevel rLevel) (lList <> rList)
 
-instance Profunctor Transaction where
+instance Profunctor AltTransaction where
   dimap fn1 fn2 = map $ \ session -> fmap fn2 . session . fn1
 
-instance Strong Transaction where
+instance Strong AltTransaction where
   first' = first
   second' = second
 
-instance Choice Transaction where
+instance Choice AltTransaction where
   left' = left
   right' = right
 
-instance Semigroupoid Transaction where
+instance Semigroupoid AltTransaction where
   o = binOp (<=<)
 
-instance Category Transaction where
-  id = Transaction Read ReadCommitted []
+instance Category AltTransaction where
+  id = AltTransaction Read ReadCommitted []
   (.) = o
 
-instance Arrow Transaction where
-  arr fn = Transaction Read ReadCommitted (return (return . fn))
+instance Arrow AltTransaction where
+  arr fn = AltTransaction Read ReadCommitted (return (return . fn))
   (***) = binOp $ \ lSession rSession (li, ri) -> (,) <$> lSession li <*> rSession ri
 
-instance ArrowChoice Transaction where
+instance ArrowChoice AltTransaction where
   (+++) = binOp $ \ lSession rSession -> either (fmap Left . lSession) (fmap Right . rSession)
 
-instance ArrowZero Transaction where
+instance ArrowZero AltTransaction where
   zeroArrow = empty
 
-instance ArrowPlus Transaction where
+instance ArrowPlus AltTransaction where
   (<+>) = (<|>)
 
 {-|
@@ -72,37 +72,37 @@ binOp ::
     (ri -> StateT Condemnation Session ro) ->
     (i -> StateT Condemnation Session o)
   ) ->
-  Transaction li lo -> Transaction ri ro -> Transaction i o
-binOp composeSessions (Transaction lMode lLevel lList) (Transaction rMode rLevel rList) = let
+  AltTransaction li lo -> AltTransaction ri ro -> AltTransaction i o
+binOp composeSessions (AltTransaction lMode lLevel lList) (AltTransaction rMode rLevel rList) = let
   mode = max lMode rMode
   level = max lLevel rLevel
   list = composeSessions <$> lList <*> rList
-  in Transaction mode level list
+  in AltTransaction mode level list
 
 {-# INLINE map #-}
 map ::
   ((i1 -> StateT Condemnation Session o1) -> (i2 -> StateT Condemnation Session o2)) ->
-  Transaction i1 o1 -> Transaction i2 o2
-map sessionFn (Transaction mode isolation list) = Transaction mode isolation (fmap sessionFn list)
+  AltTransaction i1 o1 -> AltTransaction i2 o2
+map sessionFn (AltTransaction mode isolation list) = AltTransaction mode isolation (fmap sessionFn list)
 
 {-|
 Cause transaction to eventually roll back.
 -}
-condemn :: Transaction () ()
-condemn = Transaction Read ReadCommitted [\ _ -> put Condemned]
+condemn :: AltTransaction () ()
+condemn = AltTransaction Read ReadCommitted [\ _ -> put Condemned]
 
 {-|
 It goes without saying that the statement must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-sql :: Mode -> IsolationLevel -> ByteString -> Transaction () ()
+sql :: Mode -> IsolationLevel -> ByteString -> AltTransaction () ()
 sql mode level sql = session mode level $ \ _ -> Session.sql sql
 
 {-|
 It goes without saying that the statement must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-statement :: Mode -> IsolationLevel -> Statement i o -> Transaction i o
+statement :: Mode -> IsolationLevel -> Statement i o -> AltTransaction i o
 statement mode level statement = session mode level $ \ i -> Session.statement i statement
 
 {-|
@@ -115,5 +115,5 @@ It's best for them to be defined as internal definitions inside of
 your transactions, so that its stored in the same place and
 is not possible to be affected by outside changes or be used elsewhere.
 -}
-session :: Mode -> IsolationLevel -> (i -> Session o) -> Transaction i o
-session mode level sessionFn = Transaction mode level [lift . sessionFn]
+session :: Mode -> IsolationLevel -> (i -> Session o) -> AltTransaction i o
+session mode level sessionFn = AltTransaction mode level [lift . sessionFn]
