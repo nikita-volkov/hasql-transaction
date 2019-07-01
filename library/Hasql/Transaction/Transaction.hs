@@ -22,8 +22,18 @@ module Hasql.Transaction.Transaction
   -- * Settings
   Mode(..),
   Level(..),
+  {-* Reexports -}
+  {-|
+  Despite them not being automatically rendered in the docs here we also reexport
+  the following types for you to require lesser imports:
+  
+  * `Reexports.Session`
+  * `Reexports.Statement`
+  -}
 )
 where
 
 import Hasql.Transaction.Requisites.Model
 import Hasql.Transaction.Transaction.Defs
+import qualified Hasql.Session as Reexports (Session)
+import qualified Hasql.Statement as Reexports (Statement)
