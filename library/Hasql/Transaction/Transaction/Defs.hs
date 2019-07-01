@@ -56,7 +56,7 @@ instance ArrowChoice Transaction where
   (+++) = binOp $ \ lSession rSession -> either (fmap Left . lSession) (fmap Right . rSession)
 
 instance ArrowZero Transaction where
-  zeroArrow = empty
+  zeroArrow = retry
 
 instance ArrowPlus Transaction where
   (<+>) = (<|>)
@@ -142,7 +142,7 @@ session :: Mode -> Level -> (i -> Session o) -> Transaction i o
 session mode level sessionFn = Transaction mode level [lift . sessionFn]
 
 {-|
-Fail the alternation branch, retrying with the other. Same as `empty`.
+Fail the alternation branch, retrying with the other. Same as `empty` and `zeroArrow`.
 
 Beware that if all your alternatives end up being a retry,
 you'll get yourself a perfect infinite loop.
