@@ -8,8 +8,8 @@ module Hasql.Transaction.Session
   altTransaction,
   {-* Reexports of non-conflicting types -}
   {-|
-  Despite them not being rendered in the docs here we also reexport
-  the following types for you to specify lesser imports:
+  Despite them not being automatically rendered in the docs here we also reexport
+  the following types for you to require lesser imports:
   
   * `Reexports.Transaction`
   * `Reexports.AltTransaction`
