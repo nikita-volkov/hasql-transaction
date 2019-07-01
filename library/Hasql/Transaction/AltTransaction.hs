@@ -19,7 +19,6 @@ module Hasql.Transaction.AltTransaction
   session,
   condemn,
   retry,
-  transaction,
   -- * Settings
   Mode(..),
   Level(..),

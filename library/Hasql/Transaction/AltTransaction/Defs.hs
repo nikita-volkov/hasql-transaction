@@ -5,7 +5,6 @@ import Hasql.Transaction.Requisites.Model
 import Hasql.Session (Session)
 import Hasql.Statement (Statement)
 import qualified Hasql.Session as Session
-import qualified Hasql.Transaction.Transaction.Transaction as Transaction
 
 
 {-|
@@ -141,12 +140,6 @@ to be affected by any outside changes or used elsewhere.
 -}
 session :: Mode -> Level -> (i -> Session o) -> AltTransaction i o
 session mode level sessionFn = AltTransaction mode level [lift . sessionFn]
-
-{-|
-Lift a non-alternating arrow-transaction.
--}
-transaction :: Transaction.Transaction i o -> AltTransaction i o
-transaction (Transaction.Transaction mode level sessionFn) = AltTransaction mode level [sessionFn]
 
 {-|
 Fail the alternation branch, retrying with the other. Same as `empty`.
