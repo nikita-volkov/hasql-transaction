@@ -10,7 +10,7 @@ import qualified Hasql.Decoders as C
 import qualified Hasql.Transaction.Requisites.Builders as Builders
 
 
-beginTransaction :: Mode -> IsolationLevel -> Statement () ()
+beginTransaction :: Mode -> Level -> Statement () ()
 beginTransaction mode level =
   Statement (Builder.builderBytes (Builders.beginTransaction mode level)) B.noParams C.noResult True
 

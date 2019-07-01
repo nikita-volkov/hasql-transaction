@@ -6,12 +6,12 @@ import Hasql.Transaction.Requisites.Model
 import ByteString.StrictBuilder
 
 
-beginTransaction :: Mode -> IsolationLevel -> Builder
-beginTransaction mode_ isolationLevel_ =
-  "begin " <> isolationLevel isolationLevel_ <> " " <> mode mode_
+beginTransaction :: Mode -> Level -> Builder
+beginTransaction mode_ level_ =
+  "begin " <> level level_ <> " " <> mode mode_
 
-isolationLevel :: IsolationLevel -> Builder
-isolationLevel = \ case
+level :: Level -> Builder
+level = \ case
   ReadCommitted -> "isolation level read committed"
   RepeatableRead -> "isolation level repeatable read"
   Serializable -> "isolation level serializable"

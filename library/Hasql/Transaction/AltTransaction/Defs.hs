@@ -17,7 +17,7 @@ while composing transactions in such a way that one can depend on the result of 
 A monadic interface wouldn't allow us to do the first.
 -}
 data AltTransaction i o =
-  AltTransaction Mode IsolationLevel [i -> StateT Condemnation Session o]
+  AltTransaction Mode Level [i -> StateT Condemnation Session o]
 
 deriving instance Functor (AltTransaction i)
 
@@ -95,14 +95,14 @@ condemn = AltTransaction Read ReadCommitted [\ _ -> put Condemned]
 It goes without saying that the statement must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-sql :: Mode -> IsolationLevel -> ByteString -> AltTransaction () ()
+sql :: Mode -> Level -> ByteString -> AltTransaction () ()
 sql mode level sql = session mode level $ \ _ -> Session.sql sql
 
 {-|
 It goes without saying that the statement must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-statement :: Mode -> IsolationLevel -> Statement i o -> AltTransaction i o
+statement :: Mode -> Level -> Statement i o -> AltTransaction i o
 statement mode level statement = session mode level $ \ i -> Session.statement i statement
 
 {-|
@@ -115,5 +115,5 @@ It's best for them to be defined as internal definitions inside of
 your transactions, so that its stored in the same place and
 is not possible to be affected by outside changes or be used elsewhere.
 -}
-session :: Mode -> IsolationLevel -> (i -> Session o) -> AltTransaction i o
+session :: Mode -> Level -> (i -> Session o) -> AltTransaction i o
 session mode level sessionFn = AltTransaction mode level [lift . sessionFn]
