@@ -18,6 +18,7 @@ module Hasql.Transaction.AltTransaction
   sql,
   session,
   condemn,
+  transaction,
   -- * Settings
   Mode(..),
   Level(..),

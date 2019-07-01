@@ -5,6 +5,7 @@ import Hasql.Transaction.Requisites.Model
 import Hasql.Session (Session)
 import Hasql.Statement (Statement)
 import qualified Hasql.Session as Session
+import qualified Hasql.Transaction.Transaction.Transaction as Transaction
 
 
 {-|
@@ -117,3 +118,9 @@ is not possible to be affected by outside changes or be used elsewhere.
 -}
 session :: Mode -> Level -> (i -> Session o) -> AltTransaction i o
 session mode level sessionFn = AltTransaction mode level [lift . sessionFn]
+
+{-|
+Lift a non-alternating arrow-transaction.
+-}
+transaction :: Transaction.Transaction i o -> AltTransaction i o
+transaction (Transaction.Transaction mode level sessionFn) = AltTransaction mode level [sessionFn]
