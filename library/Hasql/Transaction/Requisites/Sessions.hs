@@ -33,16 +33,14 @@ inRetryingTransaction mode isolation session =
           QueryError _ _ (ResultError (ServerError "40001" _ _ _)) -> continue
           _ -> throwError error
 
-inAlternatingTransaction :: Mode -> Level -> [Session (a, Condemnation)] -> Session (Maybe a)
+inAlternatingTransaction :: Mode -> Level -> [Session (a, Condemnation)] -> Session a
 inAlternatingTransaction mode level sessions =
   let
     loop = \ case
       session : sessionsTail -> tryTransaction mode level session >>= \ case
-        Just a -> return (Just a)
+        Just a -> return a
         Nothing -> loop sessionsTail
-      _ -> case sessions of
-        _ : _ -> loop sessions
-        _ -> return Nothing
+      _ -> loop sessions
     in loop sessions
 
 tryTransaction :: Mode -> Level -> Session (a, Condemnation) -> Session (Maybe a)

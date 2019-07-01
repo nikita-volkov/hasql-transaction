@@ -1,6 +1,6 @@
 module Hasql.Transaction.AltTransaction.Defs where
 
-import Hasql.Transaction.Prelude hiding (map)
+import Hasql.Transaction.Prelude hiding (map, retry)
 import Hasql.Transaction.Requisites.Model
 import Hasql.Session (Session)
 import Hasql.Statement (Statement)
@@ -27,7 +27,7 @@ instance Applicative (AltTransaction i) where
   (<*>) = binOp $ \ lSession rSession i -> lSession i <*> rSession i
 
 instance Alternative (AltTransaction i) where
-  empty = AltTransaction Read ReadCommitted []
+  empty = retry
   (<|>) (AltTransaction lMode lLevel lList) (AltTransaction rMode rLevel rList) =
     AltTransaction (max lMode rMode) (max lLevel rLevel) (lList <> rList)
 
@@ -124,3 +124,12 @@ Lift a non-alternating arrow-transaction.
 -}
 transaction :: Transaction.Transaction i o -> AltTransaction i o
 transaction (Transaction.Transaction mode level sessionFn) = AltTransaction mode level [sessionFn]
+
+{-|
+Fail the alternation branch, retrying with the other. Same as `empty`.
+
+Beware that if all your alternatives end up being a retry,
+you'll get yourself a perfect infinite loop.
+-}
+retry :: AltTransaction i o
+retry = AltTransaction Read ReadCommitted []

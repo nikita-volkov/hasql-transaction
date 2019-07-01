@@ -38,6 +38,6 @@ transaction input (Transaction.Transaction mode level session) =
 {-|
 Execute an alternating transaction arrow providing an input for it.
 -}
-altTransaction :: i -> AltTransaction.AltTransaction i o -> Session (Maybe o)
+altTransaction :: i -> AltTransaction.AltTransaction i o -> Session o
 altTransaction i (AltTransaction.AltTransaction mode level list) =
   inAlternatingTransaction mode level (fmap (\ fn -> runStateT (fn i) Uncondemned) list)
