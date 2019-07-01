@@ -4,13 +4,13 @@ Can be used imported in the same namespace as @Hasql.Session@ without conflicts.
 -}
 module Hasql.Transaction.Session
 (
-  altTransaction,
+  transaction,
   {-* Reexports of non-conflicting types -}
   {-|
   Despite them not being automatically rendered in the docs here we also reexport
   the following types for you to require lesser imports:
   
-  * `Reexports.AltTransaction`
+  * `Reexports.Transaction`
   -}
   module Reexports,
 )
@@ -20,13 +20,13 @@ import Hasql.Transaction.Prelude
 import Hasql.Transaction.Requisites.Model
 import Hasql.Transaction.Requisites.Sessions
 import Hasql.Session
-import qualified Hasql.Transaction.AltTransaction.Defs as AltTransaction
-import qualified Hasql.Transaction.AltTransaction.Defs as Reexports (AltTransaction)
+import qualified Hasql.Transaction.Transaction.Defs as Transaction
+import qualified Hasql.Transaction.Transaction.Defs as Reexports (Transaction)
 
 
 {-|
 Execute an alternating transaction arrow providing an input for it.
 -}
-altTransaction :: i -> AltTransaction.AltTransaction i o -> Session o
-altTransaction i (AltTransaction.AltTransaction mode level list) =
+transaction :: i -> Transaction.Transaction i o -> Session o
+transaction i (Transaction.Transaction mode level list) =
   inAlternatingTransaction mode level (fmap (\ fn -> runStateT (fn i) Uncondemned) list)

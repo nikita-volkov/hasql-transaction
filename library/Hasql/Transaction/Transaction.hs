@@ -1,4 +1,4 @@
-module Hasql.Transaction.AltTransaction
+module Hasql.Transaction.Transaction
 (
   {-|
   Arrow DSL for composition of transactions with automated conflict resolution.
@@ -13,7 +13,7 @@ module Hasql.Transaction.AltTransaction
   to make a transaction depend on the result of the other.
   For details see the docs on the `Transaction` type.
   -}
-  AltTransaction,
+  Transaction,
   statement,
   sql,
   session,
@@ -26,4 +26,4 @@ module Hasql.Transaction.AltTransaction
 where
 
 import Hasql.Transaction.Requisites.Model
-import Hasql.Transaction.AltTransaction.Defs
+import Hasql.Transaction.Transaction.Defs

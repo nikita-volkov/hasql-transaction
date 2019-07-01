@@ -1,4 +1,4 @@
-module Hasql.Transaction.AltTransaction.Defs where
+module Hasql.Transaction.Transaction.Defs where
 
 import Hasql.Transaction.Prelude hiding (map, retry)
 import Hasql.Transaction.Requisites.Model
@@ -16,49 +16,49 @@ which makes them a part of the composition as well.
 In a composed transaction they become the strictest of the ones
 associated with the transactions that constitute it.
 -}
-data AltTransaction i o =
-  AltTransaction Mode Level [i -> StateT Condemnation Session o]
+data Transaction i o =
+  Transaction Mode Level [i -> StateT Condemnation Session o]
 
-deriving instance Functor (AltTransaction i)
+deriving instance Functor (Transaction i)
 
-instance Applicative (AltTransaction i) where
-  pure = AltTransaction Read ReadCommitted . pure . const . pure
+instance Applicative (Transaction i) where
+  pure = Transaction Read ReadCommitted . pure . const . pure
   (<*>) = binOp $ \ lSession rSession i -> lSession i <*> rSession i
 
-instance Alternative (AltTransaction i) where
+instance Alternative (Transaction i) where
   empty = retry
-  (<|>) (AltTransaction lMode lLevel lList) (AltTransaction rMode rLevel rList) =
-    AltTransaction (max lMode rMode) (max lLevel rLevel) (lList <> rList)
+  (<|>) (Transaction lMode lLevel lList) (Transaction rMode rLevel rList) =
+    Transaction (max lMode rMode) (max lLevel rLevel) (lList <> rList)
 
-instance Profunctor AltTransaction where
+instance Profunctor Transaction where
   dimap fn1 fn2 = map $ \ session -> fmap fn2 . session . fn1
 
-instance Strong AltTransaction where
+instance Strong Transaction where
   first' = first
   second' = second
 
-instance Choice AltTransaction where
+instance Choice Transaction where
   left' = left
   right' = right
 
-instance Semigroupoid AltTransaction where
+instance Semigroupoid Transaction where
   o = binOp (<=<)
 
-instance Category AltTransaction where
-  id = AltTransaction Read ReadCommitted []
+instance Category Transaction where
+  id = Transaction Read ReadCommitted []
   (.) = o
 
-instance Arrow AltTransaction where
-  arr fn = AltTransaction Read ReadCommitted (return (return . fn))
+instance Arrow Transaction where
+  arr fn = Transaction Read ReadCommitted (return (return . fn))
   (***) = binOp $ \ lSession rSession (li, ri) -> (,) <$> lSession li <*> rSession ri
 
-instance ArrowChoice AltTransaction where
+instance ArrowChoice Transaction where
   (+++) = binOp $ \ lSession rSession -> either (fmap Left . lSession) (fmap Right . rSession)
 
-instance ArrowZero AltTransaction where
+instance ArrowZero Transaction where
   zeroArrow = empty
 
-instance ArrowPlus AltTransaction where
+instance ArrowPlus Transaction where
   (<+>) = (<|>)
 
 {-|
@@ -72,18 +72,18 @@ binOp ::
     (ri -> StateT Condemnation Session ro) ->
     (i -> StateT Condemnation Session o)
   ) ->
-  AltTransaction li lo -> AltTransaction ri ro -> AltTransaction i o
-binOp composeSessions (AltTransaction lMode lLevel lList) (AltTransaction rMode rLevel rList) = let
+  Transaction li lo -> Transaction ri ro -> Transaction i o
+binOp composeSessions (Transaction lMode lLevel lList) (Transaction rMode rLevel rList) = let
   mode = max lMode rMode
   level = max lLevel rLevel
   list = composeSessions <$> lList <*> rList
-  in AltTransaction mode level list
+  in Transaction mode level list
 
 {-# INLINE map #-}
 map ::
   ((i1 -> StateT Condemnation Session o1) -> (i2 -> StateT Condemnation Session o2)) ->
-  AltTransaction i1 o1 -> AltTransaction i2 o2
-map sessionFn (AltTransaction mode isolation list) = AltTransaction mode isolation (fmap sessionFn list)
+  Transaction i1 o1 -> Transaction i2 o2
+map sessionFn (Transaction mode isolation list) = Transaction mode isolation (fmap sessionFn list)
 
 {-|
 Cause transaction to eventually roll back.
@@ -94,8 +94,8 @@ whether to commit the introduced changes to the DB
 based on those results,
 as well as emit those results outside of the transaction.
 -}
-condemn :: AltTransaction () ()
-condemn = AltTransaction Read ReadCommitted [\ _ -> put Condemned]
+condemn :: Transaction () ()
+condemn = Transaction Read ReadCommitted [\ _ -> put Condemned]
 
 {-|
 Execute a possibly multistatement SQL string under a mode and level.
@@ -104,7 +104,7 @@ SQL strings cannot be dynamically parameterized or produce a result.
 __Warning:__ SQL must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-sql :: Mode -> Level -> ByteString -> AltTransaction () ()
+sql :: Mode -> Level -> ByteString -> Transaction () ()
 sql mode level sql = session mode level $ \ _ -> Session.sql sql
 
 {-|
@@ -113,7 +113,7 @@ Execute a single statement under a mode and level.
 __Warning:__ The statement must not be transaction-related
 like `BEGIN`, `COMMIT` or `ABORT`, otherwise you'll break the abstraction.
 -}
-statement :: Mode -> Level -> Statement i o -> AltTransaction i o
+statement :: Mode -> Level -> Statement i o -> Transaction i o
 statement mode level statement = session mode level $ \ i -> Session.statement i statement
 
 {-|
@@ -138,8 +138,8 @@ Thus you'll be guaranteed to have control over what's going on inside of the
 executed session and it will not be possible for this code
 to be affected by any outside changes or used elsewhere.
 -}
-session :: Mode -> Level -> (i -> Session o) -> AltTransaction i o
-session mode level sessionFn = AltTransaction mode level [lift . sessionFn]
+session :: Mode -> Level -> (i -> Session o) -> Transaction i o
+session mode level sessionFn = Transaction mode level [lift . sessionFn]
 
 {-|
 Fail the alternation branch, retrying with the other. Same as `empty`.
@@ -147,5 +147,5 @@ Fail the alternation branch, retrying with the other. Same as `empty`.
 Beware that if all your alternatives end up being a retry,
 you'll get yourself a perfect infinite loop.
 -}
-retry :: AltTransaction i o
-retry = AltTransaction Read ReadCommitted []
+retry :: Transaction i o
+retry = Transaction Read ReadCommitted []

@@ -22,14 +22,14 @@ library
   default-language: Haskell2010
   exposed-modules:
     Hasql.Transaction.Session
-    Hasql.Transaction.AltTransaction
+    Hasql.Transaction.Transaction
   other-modules:
     Hasql.Transaction.Prelude
     Hasql.Transaction.Requisites.Model
     Hasql.Transaction.Requisites.Builders
     Hasql.Transaction.Requisites.Statements
     Hasql.Transaction.Requisites.Sessions
-    Hasql.Transaction.AltTransaction.Defs
+    Hasql.Transaction.Transaction.Defs
   build-depends:
     base >=4.9 && <5,
     bytestring >=0.10 && <0.11,
