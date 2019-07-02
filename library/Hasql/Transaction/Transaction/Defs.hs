@@ -12,9 +12,11 @@ Composable transaction providing for automated conflict resolution
 with input @i@ and output @o@. Supports alternative branching.
 
 Mode and level is associated with the transaction,
-which makes them a part of the composition as well.
+which makes them participate in composition.
 In a composed transaction they become the strictest of the ones
 associated with the transactions that constitute it.
+This allows you to safely compose transactions with different
+ACID guarantees.
 -}
 data Transaction i o =
   Transaction Mode Level [i -> StateT Condemnation Session o]
@@ -128,7 +130,8 @@ if you execute statements such as `BEGIN` inside of the session.
 
 1. You must beware that in case of conflicts any IO code that you may lift
 into session will get executed multiple times.
-This is the way the automatic conflict resolution works.
+This is the way the automatic conflict resolution works:
+the transaction gets retried, when a conflict arises.
 So be cautious about doing any mutations or rocket launches in that IO!
 Simply pinging for things such as current time is totally fine though.
 

@@ -3,7 +3,7 @@ module Hasql.Transaction.Transaction
   {-|
   Arrow DSL for composition of transactions with automated conflict resolution.
 
-  /Why does it have to be an arrow, why is monad or applicative not enough?/
+  /Why does transaction have to be an arrow, why is monad or applicative not enough?/
 
   Arrow allows us to determine the read mode and isolation level,
   while composing transactions in such a way that one can depend on the result of the other.
@@ -24,8 +24,7 @@ module Hasql.Transaction.Transaction
   Level(..),
   {-* Reexports -}
   {-|
-  Despite them not being automatically rendered in the docs here we also reexport
-  the following types for you to require lesser imports:
+  This module also reexports the following types for you to require lesser imports:
   
   * `Reexports.Session`
   * `Reexports.Statement`

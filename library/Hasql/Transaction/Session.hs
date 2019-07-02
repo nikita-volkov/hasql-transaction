@@ -5,11 +5,10 @@ Can be used imported in the same namespace as @Hasql.Session@ without conflicts.
 module Hasql.Transaction.Session
 (
   transaction,
-  {-* Reexports of non-conflicting types -}
+  {-* Reexports -}
   {-|
-  Despite them not being automatically rendered in the docs here we also reexport
-  the following types for you to require lesser imports:
-  
+  This module also reexports the following types for you to require lesser imports:
+
   * `Reexports.Transaction`
   -}
   module Reexports,
