@@ -20,6 +20,7 @@ module Hasql.Transaction.Transaction
   * `Reexports.Session`
   * `Reexports.Statement`
   -}
+  module Reexports,
   {-* FAQ -}
   {-|
   == Why does transaction have to be an arrow, why is monad or applicative not enough?
