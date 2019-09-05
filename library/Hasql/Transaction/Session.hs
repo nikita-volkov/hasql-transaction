@@ -16,6 +16,6 @@ import qualified Hasql.Transaction.Transaction as Reexports (Transaction)
 {-|
 Execute an alternating transaction arrow providing an input for it.
 -}
-transact :: i -> Transaction.Transaction i o -> Session o
-transact i (Transaction.Transaction mode level list) =
+transact :: Transaction.Transaction i o -> i -> Session o
+transact (Transaction.Transaction mode level list) i =
   inAlternatingTransaction mode level (fmap (\ fn -> runStateT (fn i) Uncondemned) list)
