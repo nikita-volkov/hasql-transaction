@@ -26,6 +26,7 @@ module Hasql.Transaction.Transaction
 
   Arrow allows us to determine the read mode and isolation level,
   while composing transactions in such a way that one can depend on the result of the other.
+  
   A monadic interface wouldn't allow us to do the first, namely:
   to compose the modes and levels. 
   
