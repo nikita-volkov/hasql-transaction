@@ -134,6 +134,7 @@ This is the way the automatic conflict resolution works:
 the transaction gets retried, when a conflict arises.
 So be cautious about doing any mutations or rocket launches in that IO!
 Simply pinging for things such as current time is totally fine though.
+Still it's not recommended because it's often a symptom of bad application design.
 
 Due to the mentioned it's highly advised to keep all the session code
 inside of the definition of a transaction.
