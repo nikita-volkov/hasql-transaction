@@ -1,8 +1,8 @@
+{-|
+Arrow DSL for composition of transactions with automated conflict resolution.
+-}
 module Hasql.Transaction.Transaction
 (
-  {-|
-  Arrow DSL for composition of transactions with automated conflict resolution.
-  -}
   {-* Definitions -}
   Transaction,
   statement,
