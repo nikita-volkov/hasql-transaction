@@ -1,8 +1,8 @@
-module Hasql.Transaction.Requisites.Builders
+module Hasql.Transaction.Builders
 where
 
 import Hasql.Transaction.Prelude
-import Hasql.Transaction.Requisites.Types
+import Hasql.Transaction.Types
 import ByteString.StrictBuilder
 
 

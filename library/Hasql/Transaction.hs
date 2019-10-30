@@ -26,12 +26,12 @@ module Hasql.Transaction
 where
 
 import Hasql.Transaction.Prelude
-import Hasql.Transaction.Requisites.Types
+import Hasql.Transaction.Types
 import qualified Hasql.Session as Reexports (Session)
 import qualified Hasql.Statement as Reexports (Statement)
 import qualified Hasql.Session as Session
 import qualified Hasql.Statement as Statement
-import qualified Hasql.Transaction.Requisites.Sessions as Sessions
+import qualified Hasql.Transaction.Sessions as Sessions
 
 
 {-|

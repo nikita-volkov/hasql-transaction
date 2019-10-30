@@ -4,7 +4,7 @@ import Rebase.Prelude
 import qualified Hasql.Connection as A
 import qualified Hasql.Session as B
 import qualified Hasql.Transaction as C
-import qualified Hasql.Transaction.Requisites.Sessions as G
+import qualified Hasql.Transaction.Sessions as G
 import qualified Main.Statements as D
 import qualified Main.Transactions as E
 import qualified Control.Concurrent.Async as F

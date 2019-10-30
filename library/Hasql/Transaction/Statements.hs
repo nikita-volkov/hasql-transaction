@@ -1,13 +1,13 @@
-module Hasql.Transaction.Requisites.Statements
+module Hasql.Transaction.Statements
 where
 
 import Hasql.Transaction.Prelude
-import Hasql.Transaction.Requisites.Types
+import Hasql.Transaction.Types
 import Hasql.Statement
 import qualified ByteString.StrictBuilder as Builder
 import qualified Hasql.Encoders as B
 import qualified Hasql.Decoders as C
-import qualified Hasql.Transaction.Requisites.Builders as Builders
+import qualified Hasql.Transaction.Builders as Builders
 
 
 beginTransaction :: Mode -> Level -> Statement () ()

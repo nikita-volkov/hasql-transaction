@@ -5,13 +5,13 @@ We may want to
 do one transaction retry in case of the 23505 error, and fail if an identical
 error is seen.
 -}
-module Hasql.Transaction.Requisites.Sessions
+module Hasql.Transaction.Sessions
 where
 
 import Hasql.Transaction.Prelude
-import Hasql.Transaction.Requisites.Types
+import Hasql.Transaction.Types
 import Hasql.Session
-import qualified Hasql.Transaction.Requisites.Statements as Statements
+import qualified Hasql.Transaction.Statements as Statements
 
 
 inRetryingTransaction :: Mode -> Level -> Session (a, Condemnation) -> Session a

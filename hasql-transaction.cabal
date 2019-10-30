@@ -23,11 +23,11 @@ library
   exposed-modules:
     Hasql.Transaction
   other-modules:
+    Hasql.Transaction.Builders
     Hasql.Transaction.Prelude
-    Hasql.Transaction.Requisites.Types
-    Hasql.Transaction.Requisites.Builders
-    Hasql.Transaction.Requisites.Statements
-    Hasql.Transaction.Requisites.Sessions
+    Hasql.Transaction.Sessions
+    Hasql.Transaction.Statements
+    Hasql.Transaction.Types
   build-depends:
     base >=4.9 && <5,
     bytestring >=0.10 && <0.11,
