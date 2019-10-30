@@ -1,7 +1,7 @@
 name: hasql-transaction
 version: 0.8
 category: Hasql, Database, PostgreSQL
-synopsis: A composable abstraction over the retryable transactions for Hasql
+synopsis: Composable abstraction over retryable transactions for Hasql
 homepage: https://github.com/nikita-volkov/hasql-transaction
 bug-reports: https://github.com/nikita-volkov/hasql-transaction/issues
 author: Nikita Volkov <nikita.y.volkov@mail.ru>
