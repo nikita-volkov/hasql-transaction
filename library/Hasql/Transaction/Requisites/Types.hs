@@ -1,4 +1,4 @@
-module Hasql.Transaction.Requisites.Model
+module Hasql.Transaction.Requisites.Types
 where
 
 import Hasql.Transaction.Prelude

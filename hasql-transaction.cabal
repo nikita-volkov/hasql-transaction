@@ -24,7 +24,7 @@ library
     Hasql.Transaction
   other-modules:
     Hasql.Transaction.Prelude
-    Hasql.Transaction.Requisites.Model
+    Hasql.Transaction.Requisites.Types
     Hasql.Transaction.Requisites.Builders
     Hasql.Transaction.Requisites.Statements
     Hasql.Transaction.Requisites.Sessions

@@ -2,7 +2,7 @@ module Hasql.Transaction.Requisites.Statements
 where
 
 import Hasql.Transaction.Prelude
-import Hasql.Transaction.Requisites.Model
+import Hasql.Transaction.Requisites.Types
 import Hasql.Statement
 import qualified ByteString.StrictBuilder as Builder
 import qualified Hasql.Encoders as B

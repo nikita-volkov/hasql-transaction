@@ -9,7 +9,7 @@ module Hasql.Transaction.Requisites.Sessions
 where
 
 import Hasql.Transaction.Prelude
-import Hasql.Transaction.Requisites.Model
+import Hasql.Transaction.Requisites.Types
 import Hasql.Session
 import qualified Hasql.Transaction.Requisites.Statements as Statements
 

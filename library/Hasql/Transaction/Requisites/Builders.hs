@@ -2,7 +2,7 @@ module Hasql.Transaction.Requisites.Builders
 where
 
 import Hasql.Transaction.Prelude
-import Hasql.Transaction.Requisites.Model
+import Hasql.Transaction.Requisites.Types
 import ByteString.StrictBuilder
 
 
