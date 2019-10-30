@@ -28,8 +28,6 @@ library
     Hasql.Transaction.Requisites.Builders
     Hasql.Transaction.Requisites.Statements
     Hasql.Transaction.Requisites.Sessions
-    Hasql.Transaction.Session
-    Hasql.Transaction.Transaction
   build-depends:
     base >=4.9 && <5,
     bytestring >=0.10 && <0.11,
