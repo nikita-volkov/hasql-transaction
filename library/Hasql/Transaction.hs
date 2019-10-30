@@ -57,8 +57,9 @@ It cannot have an instance of Monad,
 because it makes it impossible to implement composition of
 mode and level associated with consituent transactions.
 It still however is possible to compose transactions
-in such a way that the result of a transaction is used in the next one
-using the recently discovered `Selective` interface.
+in such a way that the result of a transaction is used
+to decide which transaction to execute next,
+thanks to the recently discovered `Selective` interface.
 
 Supports alternative branching,
 where the alternative gets executed in case of a transaction conflict.
