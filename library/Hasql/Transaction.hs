@@ -11,6 +11,7 @@ module Hasql.Transaction
   sql,
   session,
   condemn,
+  restrict,
   {-* Settings -}
   Mode(..),
   Level(..),
@@ -139,3 +140,12 @@ as well as emit those results outside of the transaction.
 -}
 condemn :: Transaction ()
 condemn = Transaction minBound minBound [put Condemned]
+
+{-|
+Restrict the transaction isolation level.
+
+Will pick up the strictest level among the one you've specified and
+the one associated with the updated transaction.
+-}
+restrict :: Level -> Transaction a -> Transaction a
+restrict newLevel (Transaction mode oldLevel sessions) = Transaction mode (max newLevel oldLevel) sessions
