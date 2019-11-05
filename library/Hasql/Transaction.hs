@@ -78,9 +78,8 @@ instance Selective Transaction where
   select (Transaction mode1 level1 list1) (Transaction mode2 level2 list2) =
     Transaction (max mode1 mode2) (max level1 level2) (select <$> list1 <*> list2)
 
-instance Alternative Transaction where
-  empty = Transaction minBound minBound []
-  (<|>) (Transaction mode1 level1 list1) (Transaction mode2 level2 list2) =
+instance Alt Transaction where
+  (<!>) (Transaction mode1 level1 list1) (Transaction mode2 level2 list2) =
     Transaction (max mode1 mode2) (max level1 level2) (list1 <> list2)
 
 {-|
