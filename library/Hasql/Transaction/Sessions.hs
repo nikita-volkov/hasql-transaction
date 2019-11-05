@@ -14,25 +14,6 @@ import Hasql.Session
 import qualified Hasql.Transaction.Statements as Statements
 
 
-inRetryingTransaction :: Mode -> Level -> Session (a, Condemnation) -> Session a
-inRetryingTransaction mode isolation session =
-  fix $ \ recur -> catchError normal (onError recur)
-  where
-    normal =
-      do
-        statement () (Statements.beginTransaction mode isolation)
-        (result, condemnation) <- session
-        case condemnation of
-          Uncondemned -> statement () Statements.commitTransaction
-          Condemned -> statement () Statements.abortTransaction
-        return result
-    onError continue error =
-      do
-        statement () Statements.abortTransaction
-        case error of
-          QueryError _ _ (ResultError (ServerError "40001" _ _ _)) -> continue
-          _ -> throwError error
-
 inAlternatingTransaction :: Mode -> Level -> [Session (a, Condemnation)] -> Session a
 inAlternatingTransaction mode level sessions =
   let
