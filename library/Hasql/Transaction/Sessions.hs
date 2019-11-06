@@ -15,14 +15,14 @@ import qualified Hasql.Transaction.Statements as Statements
 
 
 inAlternatingTransaction :: Mode -> Level -> [Session (a, Condemnation)] -> Session a
-inAlternatingTransaction mode level =
+inAlternatingTransaction mode level sessions =
   let
     loop = \ case
       session : sessionsTail -> tryTransaction mode level session >>= \ case
         Just a -> return a
         Nothing -> loop sessionsTail
-      _ -> error "Attempt to run no alternatives"
-    in loop
+      _ -> loop sessions
+    in loop sessions
 
 tryTransaction :: Mode -> Level -> Session (a, Condemnation) -> Session (Maybe a)
 tryTransaction mode level session = do
