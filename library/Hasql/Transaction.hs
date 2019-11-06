@@ -144,7 +144,7 @@ condemn = Transaction minBound minBound [put Condemned]
 Restrict the transaction isolation level.
 
 Will pick up the strictest level among the one you've specified and
-the one associated with the updated transaction.
+the one already associated with the transaction being updated.
 -}
 restrict :: Level -> Transaction a -> Transaction a
 restrict newLevel (Transaction mode oldLevel sessions) = Transaction mode (max newLevel oldLevel) sessions
