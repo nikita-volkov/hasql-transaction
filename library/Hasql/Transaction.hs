@@ -56,7 +56,7 @@ ACID guarantees.
 
 It cannot have an instance of Monad,
 because it makes it impossible to implement composition of
-mode and level associated with consituent transactions.
+mode and level associated with constituent transactions.
 It still however is possible to compose transactions
 in such a way that the result of a transaction is used
 to decide which transaction to execute next,
