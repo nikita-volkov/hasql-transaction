@@ -25,17 +25,23 @@ inAlternatingTransaction mode level sessions =
     in loop sessions
 
 tryTransaction :: Mode -> Level -> Session (a, Condemnation) -> Session (Maybe a)
-tryTransaction mode level session = do
+tryTransaction mode level body = do
+
   statement () (Statements.beginTransaction mode level)
-  catchError
-    (do
-      (result, condemnation) <- session
-      case condemnation of
-        Uncondemned -> statement () Statements.commitTransaction
-        Condemned -> statement () Statements.abortTransaction
-      return (Just result))
-    (\ error -> do
-      statement () Statements.abortTransaction
-      case error of
-        QueryError _ _ (ResultError (ServerError "40001" _ _ _)) -> return Nothing
-        error -> throwError error)
+
+  bodyRes <- catchError (fmap Just body) $ \ error -> do
+    statement () Statements.abortTransaction
+    handleTransactionError error $ return Nothing
+
+  case bodyRes of
+    Just (res, commit) -> catchError (commitOrAbort commit $> Just res) $ \ error -> do
+      handleTransactionError error $ return Nothing
+    Nothing -> return Nothing
+
+commitOrAbort = \ case
+  Uncondemned -> statement () Statements.commitTransaction
+  Condemned -> statement () Statements.abortTransaction
+
+handleTransactionError error onTransactionError = case error of
+  QueryError _ _ (ResultError (ServerError "40001" _ _ _)) -> onTransactionError
+  error -> throwError error
