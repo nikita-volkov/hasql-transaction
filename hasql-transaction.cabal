@@ -38,7 +38,7 @@ library
     mtl >=2 && <3,
     profunctors >=5 && <6,
     transformers >=0.3 && <0.6,
-    selective >=0.3 && <0.4,
+    selective >=0.4 && <0.5,
     semigroupoids >=5.3.2 && <6
 
 test-suite conflicts-test
