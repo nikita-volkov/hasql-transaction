@@ -17,7 +17,7 @@ module Hasql.Transaction
   Level(..),
   {-* Reexports -}
   {-|
-  This module also reexports the following types for you to require lesser imports:
+  This module also reexports the following types for you to require less imports:
   
   * `Reexports.Session`
   * `Reexports.Statement`
