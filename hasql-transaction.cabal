@@ -54,6 +54,7 @@ test-suite conflicts-test
     -threaded
     "-with-rtsopts=-N"
   build-depends:
+    contravariant-extras >=0.3 && <0.4,
     hasql-transaction,
     hasql,
     async >=2.1 && <3,
