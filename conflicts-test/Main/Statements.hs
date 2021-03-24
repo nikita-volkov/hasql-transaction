@@ -1,6 +1,6 @@
 module Main.Statements where
 
-import Rebase.Prelude
+import Prelude
 import Contravariant.Extras
 import Hasql.Statement
 import qualified Hasql.Encoders as E

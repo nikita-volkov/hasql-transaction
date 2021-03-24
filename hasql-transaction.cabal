@@ -31,14 +31,14 @@ library
     Hasql.Transaction.Private.Sessions
     Hasql.Transaction.Private.Transaction
   build-depends:
-    base >=4.9 && <5,
-    bytestring >=0.10 && <0.11,
-    bytestring-tree-builder >=0.1 && <0.3,
+    base >=4.12 && <5,
+    bytestring >=0.10 && <0.12,
+    bytestring-tree-builder >=0.2.7.8 && <0.3,
     contravariant >=1.3 && <2,
     contravariant-extras >=0.3 && <0.4,
-    hasql >=1.4 && <1.5,
-    mtl >=2 && <3,
-    transformers >=0.3 && <0.6
+    hasql >=1.4.5 && <1.5,
+    mtl >=2.2 && <3,
+    transformers >=0.5 && <0.6
 
 test-suite conflicts-test
   type: exitcode-stdio-1.0
@@ -58,4 +58,4 @@ test-suite conflicts-test
     hasql-transaction,
     hasql,
     async >=2.1 && <3,
-    rebase <2
+    rerebase >=1.11 && <2

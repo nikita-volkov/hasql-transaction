@@ -1,6 +1,6 @@
 module Main.Transactions where
 
-import Rebase.Prelude
+import Prelude
 import Hasql.Transaction
 import qualified Main.Statements as A
 

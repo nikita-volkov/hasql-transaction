@@ -1,6 +1,6 @@
 module Main where
 
-import Rebase.Prelude
+import Prelude
 import qualified Hasql.Connection as A
 import qualified Hasql.Session as B
 import qualified Hasql.Transaction as C
