@@ -12,17 +12,17 @@ import qualified Hasql.Transaction.Private.SQL as D
 -- * Transactions
 -------------------------
 
-beginTransaction :: IsolationLevel -> Mode -> A.Statement () ()
-beginTransaction isolation mode =
-  A.Statement (D.beginTransaction isolation mode) B.noParams C.noResult True
+beginTransaction :: IsolationLevel -> Mode -> Bool -> A.Statement () ()
+beginTransaction isolation mode preparable =
+  A.Statement (D.beginTransaction isolation mode) B.noParams C.noResult preparable
 
-commitTransaction :: A.Statement () ()
-commitTransaction =
-  A.Statement "COMMIT" B.noParams C.noResult True
+commitTransaction :: Bool -> A.Statement () ()
+commitTransaction preparable =
+  A.Statement "COMMIT" B.noParams C.noResult preparable
 
-abortTransaction :: A.Statement () ()
-abortTransaction =
-  A.Statement "ABORT" B.noParams C.noResult True
+abortTransaction :: Bool -> A.Statement () ()
+abortTransaction preparable =
+  A.Statement "ABORT" B.noParams C.noResult preparable
 
 
 -- * Streaming
