@@ -39,5 +39,5 @@ commitOrAbort commit preparable = if commit
   else statement () (Statements.abortTransaction preparable)
 
 handleTransactionError error onTransactionError = case error of
-  QueryError _ _ (ResultError (ServerError "40001" _ _ _)) -> onTransactionError
+  QueryError _ _ (ResultError (ServerError "40001" _ _ _ _)) -> onTransactionError
   error -> throwError error
