@@ -1,14 +1,13 @@
 -- |
 -- An API for declaration of transactions.
 module Hasql.Transaction
-(
-  -- * Transaction monad
-  Transaction,
-  condemn,
-  sql,
-  statement,
-)
+  ( -- * Transaction monad
+    Transaction,
+    condemn,
+    sql,
+    statement,
+  )
 where
 
+import Hasql.Transaction.Config
 import Hasql.Transaction.Private.Transaction
-import Hasql.Transaction.Private.Model

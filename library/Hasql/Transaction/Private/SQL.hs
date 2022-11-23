@@ -1,10 +1,8 @@
-module Hasql.Transaction.Private.SQL
-where
+module Hasql.Transaction.Private.SQL where
 
-import Hasql.Transaction.Private.Prelude
-import Hasql.Transaction.Private.Model
 import qualified ByteString.TreeBuilder as D
-
+import Hasql.Transaction.Config
+import Hasql.Transaction.Private.Prelude
 
 beginTransaction :: IsolationLevel -> Mode -> ByteString
 beginTransaction isolation mode =
@@ -26,4 +24,4 @@ beginTransaction isolation mode =
 declareCursor :: ByteString -> ByteString -> ByteString
 declareCursor name sql =
   D.toByteString $
-  "DECLARE " <> D.byteString name <> " NO SCROLL CURSOR FOR " <> D.byteString sql
+    "DECLARE " <> D.byteString name <> " NO SCROLL CURSOR FOR " <> D.byteString sql

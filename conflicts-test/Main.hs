@@ -1,14 +1,13 @@
 module Main where
 
-import Prelude
+import qualified Control.Concurrent.Async as F
 import qualified Hasql.Connection as A
 import qualified Hasql.Session as B
 import qualified Hasql.Transaction as C
 import qualified Hasql.Transaction.Sessions as G
 import qualified Main.Statements as D
 import qualified Main.Transactions as E
-import qualified Control.Concurrent.Async as F
-
+import Prelude
 
 main =
   bracket acquire release use
@@ -18,8 +17,8 @@ main =
       where
         acquire =
           join $
-          fmap (either (fail . show) return) $
-          A.acquire connectionSettings
+            fmap (either (fail . show) return) $
+              A.acquire connectionSettings
           where
             connectionSettings =
               A.settings "localhost" 5432 "postgres" "" "postgres"
@@ -42,14 +41,12 @@ main =
         tests =
           [readAndWriteTransactionsTest, transactionsTest, transactionAndQueryTest]
 
-
 session connection session =
-  B.run session connection >>=
-  either (fail . show) return
+  B.run session connection
+    >>= either (fail . show) return
 
 transaction connection transaction =
   session connection (G.transaction G.RepeatableRead G.Write transaction)
-
 
 type Test =
   A.Connection -> A.Connection -> IO Bool

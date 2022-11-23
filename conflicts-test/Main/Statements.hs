@@ -1,11 +1,10 @@
 module Main.Statements where
 
-import Prelude
 import Contravariant.Extras
-import Hasql.Statement
-import qualified Hasql.Encoders as E
 import qualified Hasql.Decoders as D
-
+import qualified Hasql.Encoders as E
+import Hasql.Statement
+import Prelude
 
 createAccountTable :: Statement () ()
 createAccountTable =
@@ -45,4 +44,3 @@ getBalance =
     ((E.param . E.nonNullable) E.int8)
     (D.rowMaybe ((D.column . D.nonNullable) D.numeric))
     True
-

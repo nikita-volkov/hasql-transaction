@@ -1,16 +1,13 @@
-module Hasql.Transaction.Private.Statements
-where
+module Hasql.Transaction.Private.Statements where
 
-import Hasql.Transaction.Private.Prelude
-import Hasql.Transaction.Private.Model
-import qualified Hasql.Statement as A
-import qualified Hasql.Encoders as B
 import qualified Hasql.Decoders as C
+import qualified Hasql.Encoders as B
+import qualified Hasql.Statement as A
+import Hasql.Transaction.Config
+import Hasql.Transaction.Private.Prelude
 import qualified Hasql.Transaction.Private.SQL as D
 
-
 -- * Transactions
--------------------------
 
 beginTransaction :: IsolationLevel -> Mode -> Bool -> A.Statement () ()
 beginTransaction isolation mode preparable =
@@ -24,9 +21,7 @@ abortTransaction :: Bool -> A.Statement () ()
 abortTransaction preparable =
   A.Statement "ABORT" B.noParams C.noResult preparable
 
-
 -- * Streaming
--------------------------
 
 declareCursor :: ByteString -> ByteString -> B.Params a -> A.Statement a ()
 declareCursor name sql encoder =

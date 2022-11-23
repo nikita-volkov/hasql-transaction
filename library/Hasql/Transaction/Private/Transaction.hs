@@ -1,13 +1,11 @@
-module Hasql.Transaction.Private.Transaction
-where
+module Hasql.Transaction.Private.Transaction where
 
-import Hasql.Transaction.Private.Prelude
-import Hasql.Transaction.Private.Model
-import qualified Hasql.Statement as A
 import qualified Hasql.Session as B
-import qualified Hasql.Transaction.Private.Statements as C
+import qualified Hasql.Statement as A
+import Hasql.Transaction.Config
+import Hasql.Transaction.Private.Prelude
 import qualified Hasql.Transaction.Private.Sessions as D
-
+import qualified Hasql.Transaction.Private.Statements as C
 
 -- |
 -- A composable abstraction over the retryable transactions.
@@ -15,8 +13,8 @@ import qualified Hasql.Transaction.Private.Sessions as D
 -- Executes multiple queries under the specified mode and isolation level,
 -- while automatically retrying the transaction in case of conflicts.
 -- Thus this abstraction closely reproduces the behaviour of 'STM'.
-newtype Transaction a =
-  Transaction (StateT Bool B.Session a)
+newtype Transaction a
+  = Transaction (StateT Bool B.Session a)
   deriving (Functor, Applicative, Monad)
 
 instance Semigroup a => Semigroup (Transaction a) where

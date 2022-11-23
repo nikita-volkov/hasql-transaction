@@ -1,18 +1,17 @@
 module Hasql.Transaction.Sessions
-(
-  transaction,
-  unpreparedTransaction,
-  -- * Transaction settings
-  C.Mode(..),
-  C.IsolationLevel(..),
-)
+  ( transaction,
+    unpreparedTransaction,
+
+    -- * Transaction settings
+    C.Mode (..),
+    C.IsolationLevel (..),
+  )
 where
 
 import Data.Bool
-import qualified Hasql.Transaction.Private.Transaction as A
 import qualified Hasql.Session as B
-import qualified Hasql.Transaction.Private.Model as C
-
+import qualified Hasql.Transaction.Config as C
+import qualified Hasql.Transaction.Private.Transaction as A
 
 -- |
 -- Execute the transaction using the provided isolation level and mode.

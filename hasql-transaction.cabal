@@ -24,8 +24,8 @@ library
     Hasql.Transaction
     Hasql.Transaction.Sessions
   other-modules:
+    Hasql.Transaction.Config
     Hasql.Transaction.Private.Prelude
-    Hasql.Transaction.Private.Model
     Hasql.Transaction.Private.SQL
     Hasql.Transaction.Private.Statements
     Hasql.Transaction.Private.Sessions
