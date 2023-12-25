@@ -31,11 +31,13 @@ tryTransaction level mode body preparable = do
       handleTransactionError error $ return Nothing
     Nothing -> return Nothing
 
+commitOrAbort :: Bool -> Bool -> Session ()
 commitOrAbort commit preparable =
   if commit
     then statement () (Statements.commitTransaction preparable)
     else statement () (Statements.abortTransaction preparable)
 
+handleTransactionError :: QueryError -> Session a -> Session a
 handleTransactionError error onTransactionError = case error of
   QueryError _ _ (ResultError (ServerError "40001" _ _ _ _)) -> onTransactionError
   error -> throwError error

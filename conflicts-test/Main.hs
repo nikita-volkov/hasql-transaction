@@ -9,6 +9,7 @@ import qualified Main.Statements as D
 import qualified Main.Transactions as E
 import Prelude
 
+main :: IO ()
 main =
   bracket acquire release use
   where
@@ -16,12 +17,12 @@ main =
       (,) <$> acquire <*> acquire
       where
         acquire =
-          join $
-            fmap (either (fail . show) return) $
-              A.acquire connectionSettings
+          join
+            $ fmap (either (fail . show) return)
+            $ A.acquire connectionSettings
           where
             connectionSettings =
-              A.settings "localhost" 5432 "postgres" "" "postgres"
+              A.settings "localhost" 5432 "postgres" "postgres" "postgres"
     release (connection1, connection2) =
       do
         transaction connection1 E.dropSchema
@@ -41,10 +42,12 @@ main =
         tests =
           [readAndWriteTransactionsTest, transactionsTest, transactionAndQueryTest]
 
+session :: A.Connection -> B.Session a -> IO a
 session connection session =
   B.run session connection
     >>= either (fail . show) return
 
+transaction :: A.Connection -> C.Transaction a -> IO a
 transaction connection transaction =
   session connection (G.transaction G.RepeatableRead G.Write transaction)
 
