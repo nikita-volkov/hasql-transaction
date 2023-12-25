@@ -23,5 +23,8 @@ beginTransaction isolation mode =
 
 declareCursor :: ByteString -> ByteString -> ByteString
 declareCursor name sql =
-  D.toByteString $
-    "DECLARE " <> D.byteString name <> " NO SCROLL CURSOR FOR " <> D.byteString sql
+  D.toByteString
+    $ "DECLARE "
+    <> D.byteString name
+    <> " NO SCROLL CURSOR FOR "
+    <> D.byteString sql
