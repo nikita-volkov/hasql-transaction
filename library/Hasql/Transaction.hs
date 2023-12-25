@@ -9,5 +9,4 @@ module Hasql.Transaction
   )
 where
 
-import Hasql.Transaction.Config
 import Hasql.Transaction.Private.Transaction
