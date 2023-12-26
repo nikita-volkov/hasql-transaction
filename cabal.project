@@ -1,1 +1,3 @@
 packages: .
+constraints:
+  , bytestring >=0.12
