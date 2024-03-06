@@ -1,5 +1,5 @@
 name:          hasql-transaction
-version:       1.0.1.4
+version:       1.1
 category:      Hasql, Database, PostgreSQL
 synopsis:
   Composable abstraction over retryable transactions for Hasql
