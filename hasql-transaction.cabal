@@ -1,20 +1,19 @@
-name:          hasql-transaction
-version:       1.1
-category:      Hasql, Database, PostgreSQL
+name:               hasql-transaction
+version:            1.1
+category:           Hasql, Database, PostgreSQL
 synopsis:
   Composable abstraction over retryable transactions for Hasql
 
-homepage:      https://github.com/nikita-volkov/hasql-transaction
-bug-reports:   https://github.com/nikita-volkov/hasql-transaction/issues
-author:        Nikita Volkov <nikita.y.volkov@mail.ru>
-maintainer:    Nikita Volkov <nikita.y.volkov@mail.ru>
-copyright:     (c) 2015, Nikita Volkov
-license:       MIT
-license-file:  LICENSE
-build-type:    Simple
-cabal-version: >=1.10
-extra-source-files:
-  CHANGELOG.md
+homepage:           https://github.com/nikita-volkov/hasql-transaction
+bug-reports:        https://github.com/nikita-volkov/hasql-transaction/issues
+author:             Nikita Volkov <nikita.y.volkov@mail.ru>
+maintainer:         Nikita Volkov <nikita.y.volkov@mail.ru>
+copyright:          (c) 2015, Nikita Volkov
+license:            MIT
+license-file:       LICENSE
+build-type:         Simple
+cabal-version:      >=1.10
+extra-source-files: CHANGELOG.md
 
 source-repository head
   type:     git
