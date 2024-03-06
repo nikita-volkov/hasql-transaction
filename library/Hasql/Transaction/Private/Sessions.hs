@@ -39,5 +39,8 @@ commitOrAbort commit preparable =
 
 handleTransactionError :: QueryError -> Session a -> Session a
 handleTransactionError error onTransactionError = case error of
-  QueryError _ _ (ResultError (ServerError "40001" _ _ _ _)) -> onTransactionError
+  QueryError _ _ (ResultError (ServerError code _ _ _ _)) -> case code of
+    "40001" -> onTransactionError
+    "40P01" -> onTransactionError
+    _ -> throwError error
   error -> throwError error
