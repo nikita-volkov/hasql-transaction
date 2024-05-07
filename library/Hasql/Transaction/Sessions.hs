@@ -9,9 +9,9 @@ module Hasql.Transaction.Sessions
 where
 
 import Data.Bool
-import qualified Hasql.Session as B
-import qualified Hasql.Transaction.Config as C
-import qualified Hasql.Transaction.Private.Transaction as A
+import Hasql.Session qualified as B
+import Hasql.Transaction.Config qualified as C
+import Hasql.Transaction.Private.Transaction qualified as A
 
 -- |
 -- Execute the transaction using the provided isolation level and mode.

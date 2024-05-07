@@ -3,7 +3,7 @@ module Hasql.Transaction.Private.Sessions where
 import Hasql.Session
 import Hasql.Transaction.Config
 import Hasql.Transaction.Private.Prelude
-import qualified Hasql.Transaction.Private.Statements as Statements
+import Hasql.Transaction.Private.Statements qualified as Statements
 
 {-
 We may want to

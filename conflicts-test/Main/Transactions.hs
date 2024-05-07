@@ -1,7 +1,7 @@
 module Main.Transactions where
 
 import Hasql.Transaction
-import qualified Main.Statements as A
+import Main.Statements qualified as A
 import Prelude
 
 createSchema :: Transaction ()

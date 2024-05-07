@@ -1,8 +1,8 @@
 module Main.Statements where
 
 import Contravariant.Extras
-import qualified Hasql.Decoders as D
-import qualified Hasql.Encoders as E
+import Hasql.Decoders qualified as D
+import Hasql.Encoders qualified as E
 import Hasql.Statement
 import Prelude
 
