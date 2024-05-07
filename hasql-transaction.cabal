@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: hasql-transaction
-version: 1.1.0.1
+version: 1.1.1
 category: Hasql, Database, PostgreSQL
 synopsis:
   Composable abstraction over retryable transactions for Hasql
@@ -13,6 +13,7 @@ copyright: (c) 2015, Nikita Volkov
 license: MIT
 license-file: LICENSE
 extra-source-files: CHANGELOG.md
+tested-with: ghc ==9.8.2 || ==8.10.1
 
 source-repository head
   type: git
