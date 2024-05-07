@@ -37,10 +37,15 @@ commitOrAbort commit preparable =
     then statement () (Statements.commitTransaction preparable)
     else statement () (Statements.abortTransaction preparable)
 
-handleTransactionError :: QueryError -> Session a -> Session a
+handleTransactionError :: SessionError -> Session a -> Session a
 handleTransactionError error onTransactionError = case error of
-  QueryError _ _ (ResultError (ServerError code _ _ _ _)) -> case code of
-    "40001" -> onTransactionError
-    "40P01" -> onTransactionError
-    _ -> throwError error
-  error -> throwError error
+  QueryError _ _ clientError -> onCommandError clientError
+  PipelineError clientError -> onCommandError clientError
+  where
+    onCommandError = \case
+      ResultError (ServerError code _ _ _ _) ->
+        case code of
+          "40001" -> onTransactionError
+          "40P01" -> onTransactionError
+          _ -> throwError error
+      _ -> throwError error
