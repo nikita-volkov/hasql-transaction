@@ -15,7 +15,7 @@ jobs:
             ghc-options: ""
             ignore-haddock: true
             ignore-cabal-check: true
-          - ghc: latest
+          - ghc: 9.8.2
             ignore-cabal-check: true
 
     runs-on: ubuntu-latest
