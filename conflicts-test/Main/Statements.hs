@@ -1,6 +1,5 @@
 module Main.Statements where
 
-import Contravariant.Extras
 import Hasql.Decoders qualified as D
 import Hasql.Encoders qualified as E
 import Hasql.Statement
@@ -33,7 +32,7 @@ modifyBalance :: Statement (Int64, Scientific) Bool
 modifyBalance =
   Statement
     "update account set balance = balance + $2 where id = $1"
-    (contrazip2 ((E.param . E.nonNullable) E.int8) ((E.param . E.nonNullable) E.numeric))
+    ((fst >$< (E.param . E.nonNullable) E.int8) <> (snd >$< (E.param . E.nonNullable) E.numeric))
     (fmap (> 0) D.rowsAffected)
     True
 

@@ -38,8 +38,7 @@ fetchFromCursor step init rowDec =
     sql =
       "FETCH FORWARD $1 FROM $2"
     encoder =
-      contrazip2
-        ((B.param . B.nonNullable) B.int8)
-        ((B.param . B.nonNullable) B.bytea)
+      (fst >$< (B.param . B.nonNullable) B.int8) <>
+      (snd >$< (B.param . B.nonNullable) B.bytea)
     decoder =
       C.foldlRows step init rowDec

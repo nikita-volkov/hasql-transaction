@@ -4,7 +4,6 @@ module Hasql.Transaction.Private.Prelude
   )
 where
 
-import Contravariant.Extras as Exports
 import Control.Applicative as Exports
 import Control.Arrow as Exports
 import Control.Category as Exports
