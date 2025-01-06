@@ -10,32 +10,32 @@ We may want to
 do one transaction retry in case of the 23505 error, and fail if an identical
 error is seen.
 -}
-inRetryingTransaction :: IsolationLevel -> Mode -> Session (a, Bool) -> Bool -> Session a
-inRetryingTransaction level mode session preparable =
+inRetryingTransaction :: IsolationLevel -> Mode -> Session (a, Bool) -> Session a
+inRetryingTransaction level mode session =
   fix $ \retry -> do
-    attemptRes <- tryTransaction level mode session preparable
+    attemptRes <- tryTransaction level mode session
     case attemptRes of
       Just a -> return a
       Nothing -> retry
 
-tryTransaction :: IsolationLevel -> Mode -> Session (a, Bool) -> Bool -> Session (Maybe a)
-tryTransaction level mode body preparable = do
-  statement () (Statements.beginTransaction level mode preparable)
+tryTransaction :: IsolationLevel -> Mode -> Session (a, Bool) -> Session (Maybe a)
+tryTransaction level mode body = do
+  statement () (Statements.beginTransaction level mode)
 
   bodyRes <- catchError (fmap Just body) $ \error -> do
-    statement () (Statements.abortTransaction preparable)
+    statement () Statements.abortTransaction
     handleTransactionError error $ return Nothing
 
   case bodyRes of
-    Just (res, commit) -> catchError (commitOrAbort commit preparable $> Just res) $ \error -> do
+    Just (res, commit) -> catchError (commitOrAbort commit $> Just res) $ \error -> do
       handleTransactionError error $ return Nothing
     Nothing -> return Nothing
 
-commitOrAbort :: Bool -> Bool -> Session ()
-commitOrAbort commit preparable =
+commitOrAbort :: Bool -> Session ()
+commitOrAbort commit =
   if commit
-    then statement () (Statements.commitTransaction preparable)
-    else statement () (Statements.abortTransaction preparable)
+    then statement () Statements.commitTransaction
+    else statement () Statements.abortTransaction
 
 handleTransactionError :: SessionError -> Session a -> Session a
 handleTransactionError error onTransactionError = case error of
