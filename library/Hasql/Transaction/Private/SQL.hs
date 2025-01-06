@@ -20,11 +20,3 @@ beginTransaction isolation mode =
           case mode of
             Write -> "READ WRITE"
             Read -> "READ ONLY"
-
-declareCursor :: ByteString -> ByteString -> ByteString
-declareCursor name sql =
-  D.toByteString
-    $ "DECLARE "
-    <> D.byteString name
-    <> " NO SCROLL CURSOR FOR "
-    <> D.byteString sql
