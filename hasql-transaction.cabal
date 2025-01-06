@@ -115,6 +115,6 @@ test-suite conflicts-test
 
   build-depends:
     async >=2.1 && <3,
-    hasql,
+    hasql >=1.9,
     hasql-transaction,
     rerebase >=1.11 && <2,
