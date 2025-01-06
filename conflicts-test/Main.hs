@@ -2,6 +2,9 @@ module Main where
 
 import Control.Concurrent.Async qualified as F
 import Hasql.Connection qualified as A
+import Hasql.Connection.Setting qualified as H
+import Hasql.Connection.Setting.Connection qualified as I
+import Hasql.Connection.Setting.Connection.Param qualified as J
 import Hasql.Session qualified as B
 import Hasql.Transaction qualified as C
 import Hasql.Transaction.Sessions qualified as G
@@ -22,7 +25,16 @@ main =
             $ A.acquire connectionSettings
           where
             connectionSettings =
-              A.settings "localhost" 5432 "postgres" "postgres" "postgres"
+              [ H.connection
+                  ( I.params
+                      [ J.host "localhost",
+                        J.port 5432,
+                        J.user "postgres",
+                        J.password "postgres",
+                        J.dbname "postgres"
+                      ]
+                  )
+              ]
     release (connection1, connection2) =
       do
         transaction connection1 E.dropSchema
