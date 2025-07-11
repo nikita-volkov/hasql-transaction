@@ -10,25 +10,25 @@ We may want to
 do one transaction retry in case of the 23505 error, and fail if an identical
 error is seen.
 -}
-inRetryingTransaction :: IsolationLevel -> Mode -> Session (a, Bool) -> Session a
-inRetryingTransaction level mode session =
+inRetryingTransaction :: IsolationLevel -> Mode -> Bool -> Session (a, Bool) -> Session a
+inRetryingTransaction level mode retryOnError session =
   fix $ \retry -> do
-    attemptRes <- tryTransaction level mode session
+    attemptRes <- tryTransaction level mode retryOnError session
     case attemptRes of
       Just a -> return a
       Nothing -> retry
 
-tryTransaction :: IsolationLevel -> Mode -> Session (a, Bool) -> Session (Maybe a)
-tryTransaction level mode body = do
+tryTransaction :: IsolationLevel -> Mode -> Bool -> Session (a, Bool) -> Session (Maybe a)
+tryTransaction level mode retryOnError body = do
   statement () (Statements.beginTransaction level mode)
 
   bodyRes <- catchError (fmap Just body) $ \error -> do
     statement () Statements.abortTransaction
-    handleTransactionError error $ return Nothing
+    handleTransactionError error retryOnError $ return Nothing
 
   case bodyRes of
     Just (res, commit) -> catchError (commitOrAbort commit $> Just res) $ \error -> do
-      handleTransactionError error $ return Nothing
+      handleTransactionError error retryOnError $ return Nothing
     Nothing -> return Nothing
 
 commitOrAbort :: Bool -> Session ()
@@ -37,15 +37,16 @@ commitOrAbort commit =
     then statement () Statements.commitTransaction
     else statement () Statements.abortTransaction
 
-handleTransactionError :: SessionError -> Session a -> Session a
-handleTransactionError error onTransactionError = case error of
+handleTransactionError :: SessionError -> Bool -> Session a -> Session a
+handleTransactionError error retryOnError onTransactionError = case error of
   QueryError _ _ clientError -> onCommandError clientError
   PipelineError clientError -> onCommandError clientError
   where
+    retryOrThrow = if retryOnError then onTransactionError else throwError error
     onCommandError = \case
       ResultError (ServerError code _ _ _ _) ->
         case code of
-          "40001" -> onTransactionError
-          "40P01" -> onTransactionError
+          "40001" -> retryOrThrow
+          "40P01" -> retryOrThrow
           _ -> throwError error
       _ -> throwError error

@@ -52,7 +52,7 @@ main =
         runTest test =
           test connection1 connection2
         tests =
-          [readAndWriteTransactionsTest, transactionsTest, transactionAndQueryTest]
+          [readAndWriteTransactionsTest, transactionsTest, transactionsNoRetryTest, transactionAndQueryTest]
 
 session :: A.Connection -> B.Session a -> IO a
 session connection session =
@@ -62,6 +62,10 @@ session connection session =
 transaction :: A.Connection -> C.Transaction a -> IO a
 transaction connection transaction =
   session connection (G.transaction G.RepeatableRead G.Write transaction)
+
+transactionNoRetry :: A.Connection -> C.Transaction a -> IO a
+transactionNoRetry connection transaction =
+  session connection (G.transactionNoRetry G.RepeatableRead G.Write transaction)
 
 type Test =
   A.Connection -> A.Connection -> IO Bool
@@ -80,6 +84,19 @@ transactionsTest connection1 connection2 =
     traceShowM balance1
     traceShowM balance2
     return (balance1 == Just 2000 && balance2 == Just (-2000))
+
+transactionsNoRetryTest :: Test
+transactionsNoRetryTest connection1 connection2 =
+  do
+    id1 <- session connection1 (B.statement 0 D.createAccount)
+    id2 <- session connection1 (B.statement 0 D.createAccount)
+    async1 <- F.async (replicateM_ 1000 (transactionNoRetry connection1 (E.transfer id1 id2 1)))
+    async2 <- F.async (replicateM_ 1000 (transactionNoRetry connection2 (E.transfer id1 id2 1)))
+    result1 <- F.waitCatch async1
+    result2 <- F.waitCatch async2
+    let serialError = sequenceA [result1, result2]
+    traceShowM serialError
+    return $ either (("40001" `isInfixOf`) . show) (pure False) serialError
 
 readAndWriteTransactionsTest :: Test
 readAndWriteTransactionsTest connection1 connection2 =
