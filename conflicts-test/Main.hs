@@ -48,7 +48,7 @@ main =
 
 session :: A.Connection -> B.Session a -> IO a
 session connection session =
-  B.run session connection
+  A.use connection session
     >>= either (fail . show) return
 
 transaction :: A.Connection -> C.Transaction a -> IO a
