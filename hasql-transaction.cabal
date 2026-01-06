@@ -77,7 +77,7 @@ common test
 
 library
   import: base
-  hs-source-dirs: library
+  hs-source-dirs: src/library
   exposed-modules:
     Hasql.Transaction
     Hasql.Transaction.Sessions
@@ -103,7 +103,7 @@ library
 test-suite conflicts-test
   import: test
   type: exitcode-stdio-1.0
-  hs-source-dirs: conflicts-test
+  hs-source-dirs: src/conflicts-test
   main-is: Main.hs
   other-modules:
     Main.Statements
