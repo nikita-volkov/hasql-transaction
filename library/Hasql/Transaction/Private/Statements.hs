@@ -5,7 +5,6 @@ import Hasql.Decoders qualified as C
 import Hasql.Encoders qualified as B
 import Hasql.Statement qualified as A
 import Hasql.Transaction.Config
-import Hasql.Transaction.Private.Prelude
 import Hasql.Transaction.Private.SQL qualified as D
 
 beginTransaction :: IsolationLevel -> Mode -> A.Statement () ()
