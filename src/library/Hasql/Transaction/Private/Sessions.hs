@@ -1,5 +1,6 @@
 module Hasql.Transaction.Private.Sessions where
 
+import Hasql.Errors (ServerError (..), SessionError (..), StatementError (..))
 import Hasql.Session
 import Hasql.Transaction.Config
 import Hasql.Transaction.Private.Prelude
@@ -39,14 +40,16 @@ commitOrAbort commit =
 
 handleTransactionError :: SessionError -> Bool -> Session a -> Session a
 handleTransactionError error retryOnError onTransactionError = case error of
-  QueryError _ _ clientError -> onCommandError clientError
-  PipelineError clientError -> onCommandError clientError
+  StatementSessionError _ _ _ _ _ statementError -> onStatementError statementError
+  ScriptSessionError _ serverError -> onServerError serverError
+  _ -> throwError error
   where
     retryOrThrow = if retryOnError then onTransactionError else throwError error
-    onCommandError = \case
-      ResultError (ServerError code _ _ _ _) ->
-        case code of
-          "40001" -> retryOrThrow
-          "40P01" -> retryOrThrow
-          _ -> throwError error
+    onStatementError = \case
+      ServerStatementError serverError -> onServerError serverError
       _ -> throwError error
+    onServerError (ServerError code _ _ _ _) =
+      case code of
+        "40001" -> retryOrThrow
+        "40P01" -> retryOrThrow
+        _ -> throwError error

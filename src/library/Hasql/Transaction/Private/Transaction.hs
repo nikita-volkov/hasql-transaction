@@ -1,5 +1,6 @@
 module Hasql.Transaction.Private.Transaction where
 
+import Data.Text.Encoding qualified as Text
 import Hasql.Session qualified as B
 import Hasql.Statement qualified as A
 import Hasql.Transaction.Config
@@ -36,7 +37,7 @@ run (Transaction session) isolation mode retryOnError =
 {-# INLINE sql #-}
 sql :: ByteString -> Transaction ()
 sql =
-  Transaction . lift . B.sql
+  Transaction . lift . B.script . Text.decodeUtf8
 
 -- |
 -- Parameters and a specification of the parametric query to apply them to.
