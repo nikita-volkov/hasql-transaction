@@ -9,7 +9,7 @@ on:
 jobs:
 
   format:
-    uses: ./.github/workflows/format.yaml
+    uses: nikita-volkov/haskell-hackage-lib-github-actions-workflows/.github/workflows/format.yaml@v4
     secrets: inherit
 
   check:
