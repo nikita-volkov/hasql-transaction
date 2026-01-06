@@ -10,7 +10,7 @@ createAccountTable =
   unpreparable sql E.noParams D.noResult
   where
     sql =
-      "create table account (id serial not null, balance numeric not null, primary key (id))"
+      "create table account (id bigserial not null, balance numeric not null, primary key (id))"
 
 dropAccountTable :: Statement () ()
 dropAccountTable =
