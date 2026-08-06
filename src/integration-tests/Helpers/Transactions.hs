@@ -1,25 +1,23 @@
-module Main.Transactions where
+module Helpers.Transactions where
 
 import Hasql.Transaction
-import Main.Statements qualified as A
+import Helpers.Statements qualified as Statements
 import Prelude
 
 createSchema :: Transaction ()
 createSchema =
-  do
-    statement () A.createAccountTable
+  statement () Statements.createAccountTable
 
 dropSchema :: Transaction ()
 dropSchema =
-  do
-    statement () A.dropAccountTable
+  statement () Statements.dropAccountTable
 
 transfer :: Int64 -> Int64 -> Scientific -> Transaction Bool
 transfer id1 id2 amount =
   do
-    success <- statement (id1, amount) A.modifyBalance
+    success <- statement (id1, amount) Statements.modifyBalance
     if success
-      then statement (id2, negate amount) A.modifyBalance
+      then statement (id2, negate amount) Statements.modifyBalance
       else return False
 
 transferTimes :: Int -> Int64 -> Int64 -> Scientific -> Transaction ()

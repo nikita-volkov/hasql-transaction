@@ -1,4 +1,4 @@
-module Main.Statements where
+module Helpers.Statements where
 
 import Hasql.Decoders qualified as D
 import Hasql.Encoders qualified as E
