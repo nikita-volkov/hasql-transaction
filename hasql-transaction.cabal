@@ -85,8 +85,8 @@ library
   other-modules:
     Hasql.Transaction.Config
     Hasql.Transaction.Private.Prelude
-    Hasql.Transaction.Private.SQL
     Hasql.Transaction.Private.Sessions
+    Hasql.Transaction.Private.SQL
     Hasql.Transaction.Private.Statements
     Hasql.Transaction.Private.Transaction
 
