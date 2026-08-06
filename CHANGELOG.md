@@ -1,4 +1,4 @@
-# v1.2.3
+# v1.2.2.1
 
 - Conform to the new `hasql` API (v2.0)
 
