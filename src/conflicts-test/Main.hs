@@ -8,6 +8,7 @@ import Hasql.Transaction qualified as C
 import Hasql.Transaction.Sessions qualified as G
 import Main.Statements qualified as D
 import Main.Transactions qualified as E
+import Pqi.Native qualified as Pqi
 import Prelude
 
 main :: IO ()
@@ -18,9 +19,8 @@ main =
       (,) <$> acquire <*> acquire
       where
         acquire =
-          join
-            $ fmap (either (fail . show) return)
-            $ A.acquire connectionSettings
+          A.acquire Pqi.adapter connectionSettings
+            >>= either (fail . show) return
           where
             connectionSettings =
               H.hostAndPort "localhost" 5432

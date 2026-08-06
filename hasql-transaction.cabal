@@ -118,4 +118,5 @@ test-suite conflicts-test
     async >=2.1 && <3,
     hasql >=1.9,
     hasql-transaction,
+    pqi-native,
     rerebase >=1.11 && <2,
