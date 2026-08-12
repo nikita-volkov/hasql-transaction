@@ -1,3 +1,9 @@
+# v1.2.3.0
+
+## Non-breaking
+
+- Add `Semigroup`/`Monoid` instances for `Mode` and `IsolationLevel`, combining via `max` with `mempty` as the weakest value, so composed transaction requirements escalate to the strictest one explicitly requested.
+
 # v1.2.2.1
 
 - Conform to the new `hasql` API (v2.0)
