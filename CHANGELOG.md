@@ -1,3 +1,7 @@
+# v1.2.3.1
+
+- Update test dependencies
+
 # v1.2.3.0
 
 ## Non-breaking

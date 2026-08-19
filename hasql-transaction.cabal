@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name: hasql-transaction
-version: 1.2.3.0
+version: 1.2.3.1
 category: Hasql, Database, PostgreSQL
 synopsis:
   Composable abstraction over retryable transactions for Hasql
@@ -122,7 +122,7 @@ test-suite test
     hasql,
     hasql-transaction,
     hspec >=2.6 && <3,
-    pqi ^>=1.0,
+    pqi ^>=1.1,
     pqi-ffi ^>=1.0,
     pqi-native ^>=1.0,
     rerebase >=1.11 && <2,
