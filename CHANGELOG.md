@@ -1,3 +1,7 @@
+# v1.2.3.2
+
+- Support `hasql-2.1`
+
 # v1.2.3.1
 
 - Update test dependencies
